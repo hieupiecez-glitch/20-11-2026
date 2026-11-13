@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>20/11 — THE ART OF GRATITUDE | Hành Trình Tri Ân Nhà Giáo Việt Nam</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              midnight: {
+                DEFAULT: '#080d1a',
+                deep: '#050811',
+                soft: '#0f172a',
+                card: '#111a2e'
+              },
+              ivory: {
+                DEFAULT: '#f6f1e7',
+                warm: '#ede4d3',
+                muted: '#cfc5b4'
+              },
+              gold: {
+                DEFAULT: '#c9a45c',
+                light: '#e2c585',
+                dark: '#9a7836'
+              },
+              champagne: {
+                DEFAULT: '#f3e5ab',
+                glow: '#faeecd'
+              },
+              burgundy: {
+                DEFAULT: '#6e2c3b',
+                deep: '#4d1d28',
+                light: '#8f3d4f'
+              },
+              dusty: {
+                DEFAULT: '#6c859d',
+                light: '#94acc4',
+                dark: '#3e5266'
+              }
+            },
+            fontFamily: {
+              serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+              sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+              hand: ['"Dancing Script"', 'cursive']
+            }
+          }
+        }
+      };
+    }
+  </script>
+  <style>
+    :root {
+      --bg-midnight: #080d1a;
+      --text-ivory: #f6f1e7;
+      --accent-gold: #c9a45c;
+      --light-champagne: #f3e5ab;
+      --accent-burgundy: #6e2c3b;
+      --trans-dusty: #6c859d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-midnight);
+      color: var(--text-ivory);
+      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Offline-resilient core layout utilities */
+    .hidden { display: none; }
+    .chapter-section { position: relative; min-height: 100vh; width: 100%; overflow: hidden; }
+    #ambient-particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    #main-navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; background: rgba(8, 13, 26, 0.88); }
+    #journey-progress-bar { height: 2px; background: linear-gradient(90deg, #6e2c3b, #c9a45c, #f3e5ab); transition: width 0.3s ease; }
+    #book-3d-stage { position: relative; width: 100%; min-height: 480px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    #three-book-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    #orbiting-words-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; }
+
+    ::selection {
+      background: rgba(201, 164, 92, 0.35);
+      color: #f6f1e7;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #050811;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3e5266;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #c9a45c;
+    }
+
+    .font-editorial {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+    .font-handwritten {
+      font-family: 'Dancing Script', cursive;
+    }
+
+    /* =====================================================================
+       SECTION V.1: 10 TEXT REVEAL ENGINE MODES
+    ====================================================================== */
+    .reveal-fade {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal-fade.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-blur {
+      opacity: 0;
+      filter: blur(10px);
+      transform: scale(0.97);
+      transition: opacity 1.05s ease, filter 1.05s ease, transform 1.05s ease;
+    }
+    .reveal-blur.is-visible {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+
+    .reveal-spacing {
+      opacity: 0;
+      letter-spacing: 0.36em;
+      transition: opacity 1.15s ease, letter-spacing 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-spacing.is-visible {
+      opacity: 1;
+      letter-spacing: 0.14em;
+    }
+
+    .reveal-mask {
+      overflow: hidden;
+      display: inline-block;
+    }
+    .reveal-mask > span {
+      display: inline-block;
+      transform: translateY(105%);
+      transition: transform 0.95s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    .reveal-mask.is-visible > span {
+      transform: translateY(0%);
+    }
+
+    .reveal-clip {
+      clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+      transition: clip-path 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+    .reveal-clip.is-visible {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    .reveal-words .word-unit {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+      margin-right: 0.26em;
+    }
+    .reveal-words.is-visible .word-unit {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-lines .line-unit {
+      display: block;
+      opacity: 0;
+      transform: translateX(-14px);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .reveal-lines.is-visible .line-unit {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-scroll {
+      opacity: 0;
+      transform: translateY(24px) scale(0.98);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .reveal-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Chalkboard & Notebook Texture */
+    .chalkboard-surface {
+      background: radial-gradient(circle at 35% 30%, #1d2d27 0%, #111b17 65%, #0c1310 100%);
+      box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.75), 0 20px 50px rgba(0, 0, 0, 0.65);
+      border: 8px solid #3c2a1e;
+      position: relative;
+    }
+    .chalk-text {
+      color: rgba(246, 241, 231, 0.92);
+      text-shadow: 0 0 2px rgba(255, 255, 255, 0.4), 1px 1px 0px rgba(255,255,255,0.15);
+    }
+
+    .notebook-paper {
+      background-color: #f6f1e7;
+      background-image:
+        linear-gradient(90deg, transparent 39px, rgba(180, 90, 90, 0.35) 39px, rgba(180, 90, 90, 0.35) 41px, transparent 41px),
+        linear-gradient(#e1d8c7 1px, transparent 1px);
+      background-size: 100% 28px;
+      color: #232b38;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    /* 3D Book Stage & Hybrid CSS3D Architecture */
+    .book-viewport {
+      perspective: 1800px;
+      transform-style: preserve-3d;
+    }
+
+    .book-3d-assembly {
+      position: relative;
+      width: 680px;
+      max-width: calc(100vw - 32px);
+      height: 440px;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1023px) {
+      .book-3d-assembly {
+        width: 520px;
+        height: 360px;
+      }
+    }
+
+    @media (max-width: 639px) {
+      .book-3d-assembly {
+        width: 300px;
+        height: 410px;
+      }
+    }
+
+    .book-spine-3d {
+      position: absolute;
+      left: 50%;
+      top: -6px;
+      bottom: -6px;
+      width: 34px;
+      margin-left: -17px;
+      background: linear-gradient(90deg, #38141d 0%, #6e2c3b 45%, #c9a45c 50%, #521d29 55%, #2c0f16 100%);
+      transform: translateZ(-14px);
+      border-radius: 4px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+      z-index: 2;
+    }
+
+    .book-page-stack-left,
+    .book-page-stack-right {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      width: calc(50% - 6px);
+      background: repeating-linear-gradient(
+        90deg,
+        #f6f1e7 0px,
+        #f6f1e7 2px,
+        #dfd5c3 2px,
+        #dfd5c3 4px
+      );
+      border-radius: 3px;
+      box-shadow: inset 0 0 18px rgba(154, 120, 54, 0.22), 0 22px 45px rgba(0, 0, 0, 0.7);
+    }
+
+    .book-page-stack-left {
+      left: 4px;
+      transform: translateZ(-8px);
+      border-left: 6px solid #c9a45c;
+    }
+    .book-page-stack-right {
+      right: 4px;
+      transform: translateZ(-8px);
+      border-right: 6px solid #c9a45c;
+    }
+
+    .book-page-surface {
+      background: radial-gradient(circle at 50% 35%, #fbf8f1 0%, #f3ead8 75%, #e6dac3 100%);
+      color: #1c2230;
+      box-shadow: inset 0 0 32px rgba(154, 120, 54, 0.16);
+    }
+
+    .book-page-left-shadow {
+      background: linear-gradient(90deg, rgba(0,0,0,0.04) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.22) 100%);
+    }
+    .book-page-right-shadow {
+      background: linear-gradient(90deg, rgba(0,0,0,0.22) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.04) 100%);
+    }
+
+    /* Orbiting 3D Words around the Book */
+    .orbit-word-node {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      will-change: transform, opacity;
+      pointer-events: auto;
+    }
+
+    .orbit-word-node:hover,
+    .orbit-word-node.is-active-word {
+      color: #080d1a !important;
+      background: linear-gradient(135deg, #f3e5ab 0%, #c9a45c 100%) !important;
+      border-color: #f6f1e7 !important;
+      box-shadow: 0 0 25px rgba(243, 229, 171, 0.75) !important;
+      z-index: 60 !important;
+    }
+
+    /* Transition Curtain */
+    #chapter-transition-veil {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      background: radial-gradient(circle at center, rgba(243, 229, 171, 0.16) 0%, rgba(8, 13, 26, 0.96) 70%);
+      backdrop-filter: blur(8px);
+    }
+    #chapter-transition-veil.is-active {
+      opacity: 1;
+    }
+
+    /* Ambient Glows */
+    .FirstLightBeam {
+      background: conic-gradient(from 180deg at 50% 0%, transparent 42%, rgba(243, 229, 171, 0.18) 48%, rgba(201, 164, 92, 0.32) 50%, rgba(243, 229, 171, 0.18) 52%, transparent 58%);
+      filter: blur(26px);
+      transform-origin: top center;
+      animation: beamPulse 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes beamPulse {
+      0% { transform: scaleX(0.85) rotate(-2deg); opacity: 0.65; }
+      100% { transform: scaleX(1.18) rotate(2deg); opacity: 0.98; }
+    }
+
+    /* Reduced Motion Override */
+    html.reduced-motion *,
+    html.reduced-motion *::before,
+    html.reduced-motion *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    html.reduced-motion .reveal-fade,
+    html.reduced-motion .reveal-blur,
+    html.reduced-motion .reveal-spacing,
+    html.reduced-motion .reveal-clip,
+    html.reduced-motion .reveal-scroll,
+    html.reduced-motion .reveal-words .word-unit,
+    html.reduced-motion .reveal-lines .line-unit,
+    html.reduced-motion .reveal-mask > span {
+      opacity: 1 !important;
+      filter: none !important;
+      transform: none !important;
+      clip-path: none !important;
+    }
+  </style>
+</head>
+<body class="bg-midnight text-ivory antialiased selection:bg-gold/30 selection:text-ivory">
+
+  <!-- GLOBAL BACKGROUND AMBIENT CANVAS (Particles & Depth Light) -->
+  <canvas id="ambient-particle-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0" aria-hidden="true"></canvas>
+
+  <!-- CHAPTER TRANSITION VEIL -->
+  <div id="chapter-transition-veil" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="text-center px-4">
+      <p id="transition-chapter-code" class="text-xs uppercase tracking-[0.35em] text-gold/80 mb-2">CHƯƠNG 01</p>
+      <p id="transition-chapter-name" class="font-editorial italic text-2xl md:text-4xl text-ivory">Ánh sáng đầu tiên</p>
+    </div>
+  </div>
+
+  <!-- TOP NAVIGATION & JOURNEY PROGRESS BAR (Section VIII) -->
+  <header id="main-navbar" class="fixed top-0 left-0 right-0 z-40 bg-midnight/85 backdrop-blur-md border-b border-gold/15 transition-all duration-300">
+    <!-- Journey Progress Line -->
+    <div class="w-full h-[2px] bg-midnight-soft overflow-hidden">
+      <div id="journey-progress-bar" class="h-full bg-gradient-to-r from-burgundy via-gold to-champagne transition-all duration-300" style="width: 12.5%;"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+      <!-- Brand Identity & Current Chapter Badge -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <button id="brand-home-btn" type="button" class="flex items-center gap-2 text-left group focus:outline-none" title="Về Chương 01 — The First Light">
+          <span class="w-8 h-8 shrink-0 rounded-full border border-gold/50 bg-gold/10 flex items-center justify-center text-gold font-editorial font-bold text-sm group-hover:bg-gold group-hover:text-midnight transition-colors">
+            20
+          </span>
+          <div class="truncate">
+            <span class="block text-[10px] uppercase tracking-[0.2em] text-gold font-medium truncate">20/11 • Art of Gratitude</span>
+            <span id="nav-current-chapter-label" class="block text-xs sm:text-sm text-ivory/90 font-editorial italic truncate">01. Ánh sáng đầu tiên</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Desktop Chapter Navigation Pills -->
+      <nav aria-label="Điều hướng chương" class="hidden xl:flex items-center gap-1 bg-midnight-soft/90 border border-gold/15 rounded-full px-2 py-1">
+        <button type="button" data-nav-chapter="0" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-midnight bg-gold font-medium">01. Intro</button>
+        <button type="button" data-nav-chapter="1" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory">02. Ký ức</button>
+        <button type="button" data-nav-chapter="2" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory">03. Cuốn sách</button>
+        <button type="button" data-nav-chapter="3" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory">04. Người gieo tri thức</button>
+        <button type="button" data-nav-chapter="4" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory">05. Những lá thư</button>
+        <button type="button" data-nav-chapter="5" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory">06. Khu vườn</button>
+        <button type="button" data-nav-chapter="6" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory">07. Hành trình</button>
+        <button type="button" data-nav-chapter="7" class="chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory">08. Lời tri ân</button>
+      </nav>
+
+      <!-- Action Controls: Prev/Next, Audio, Reduced Motion, Fullscreen, Mobile Menu -->
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+        <button id="btn-prev-chapter" type="button" class="px-2 sm:px-2.5 py-1.5 rounded-full border border-gold/25 bg-midnight-soft/80 hover:border-gold/70 text-xs text-ivory/85 flex items-center gap-1 transition-colors disabled:opacity-35" title="Chương trước">
+          <span aria-hidden="true">←</span>
+          <span class="hidden md:inline">Quay lại</span>
+        </button>
+        <button id="btn-next-chapter" type="button" class="px-2 sm:px-2.5 py-1.5 rounded-full border border-gold/40 bg-gold/15 hover:bg-gold/25 text-xs text-champagne flex items-center gap-1 transition-colors" title="Chương tiếp theo">
+          <span class="hidden md:inline">Tiếp tục</span>
+          <span aria-hidden="true">→</span>
+        </button>
+
+        <!-- Audio Toggle (Section VII) -->
+        <button id="btn-audio-toggle" type="button" aria-pressed="false" class="px-2 sm:px-2.5 py-1.5 rounded-full border border-gold/25 bg-midnight-soft/80 hover:border-gold text-xs text-ivory/85 flex items-center gap-1.5 transition-colors" title="Bật/Tắt nhạc nền Piano & hiệu ứng âm thanh">
+          <span id="audio-status-dot" class="w-2 h-2 rounded-full bg-dusty"></span>
+          <span id="audio-status-label" class="hidden sm:inline">Âm thanh: Tắt</span>
+        </button>
+
+        <!-- Reduced Motion Toggle (Section XIII) -->
+        <button id="btn-motion-toggle" type="button" aria-pressed="false" class="px-2.5 py-1.5 rounded-full border border-gold/20 bg-midnight-soft/80 hover:border-gold/60 text-xs text-ivory/75 hidden sm:flex items-center gap-1 transition-colors" title="Chế độ giảm chuyển động (Accessibility)">
+          <span id="motion-status-label">Motion: Đầy đủ</span>
+        </button>
+
+        <!-- Fullscreen Toggle (Section VIII) -->
+        <button id="btn-fullscreen-toggle" type="button" class="p-1.5 rounded-full border border-gold/20 bg-midnight-soft/80 hover:border-gold/60 text-xs text-ivory/80 hidden sm:inline-flex transition-colors" title="Toàn màn hình">
+          <span class="px-1 font-mono text-[11px]">[ ]</span>
+        </button>
+
+        <!-- Mobile/Tablet Chapter Drawer Button -->
+        <button id="btn-mobile-chapters" type="button" class="xl:hidden px-2.5 py-1.5 rounded-full border border-gold/35 bg-gold/10 text-xs text-gold font-medium">
+          Mục lục
+        </button>
+      </div>
+    </div>
+
+    <!-- Collapsible Chapter Selector Drawer for Mobile/Tablet -->
+    <div id="mobile-chapter-drawer" class="hidden xl:hidden bg-midnight-deep/95 border-b border-gold/20 px-4 py-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-4xl mx-auto">
+        <button type="button" data-nav-chapter="0" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/30 bg-gold/15 text-xs text-ivory">01. Intro — Ánh sáng đầu tiên</button>
+        <button type="button" data-nav-chapter="1" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80">02. Ký ức — Lớp học xưa</button>
+        <button type="button" data-nav-chapter="2" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80">03. Cuốn sách tri ân (3D)</button>
+        <button type="button" data-nav-chapter="3" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80">04. Người gieo tri thức</button>
+        <button type="button" data-nav-chapter="4" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80">05. Những lá thư</button>
+        <button type="button" data-nav-chapter="5" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80">06. Khu vườn tri thức</button>
+        <button type="button" data-nav-chapter="6" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80">07. Hành trình phía trước</button>
+        <button type="button" data-nav-chapter="7" class="mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80">08. Lời tri ân 20/11</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN STORYTELLING JOURNEY CONTAINER -->
+  <main id="journey-main" class="relative z-10 pt-14 sm:pt-16">
+
+    <!-- ===================================================================
+         CHƯƠNG 01 — THE FIRST LIGHT (Ánh sáng đầu tiên)
+    ==================================================================== -->
+    <section id="chapter-01" data-chapter-index="0" class="chapter-section relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-8 py-16 sm:py-20 overflow-hidden border-b border-gold/10">
+      <!-- Volumetric Central Light Ray -->
+      <div class="FirstLightBeam absolute top-0 left-1/2 -translate-x-1/2 w-[550px] sm:w-[850px] h-[680px] pointer-events-none" aria-hidden="true"></div>
+      <div data-parallax-speed="0.12" class="parallax-layer absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gold/10 blur-[110px] pointer-events-none" aria-hidden="true"></div>
+
+      <!-- Skip Intro Action (Section VIII requirement) -->
+      <div class="w-full max-w-5xl flex justify-end mb-4 relative z-20">
+        <button id="btn-skip-intro" type="button" class="text-xs text-dusty-light hover:text-champagne underline underline-offset-4 transition-colors">
+          Bỏ qua hiệu ứng mở đầu → Đến thẳng Lớp học ký ức
+        </button>
+      </div>
+
+      <div class="max-w-4xl mx-auto text-center relative z-20">
+        <!-- Chapter Badge -->
+        <div data-reveal-mode="fade-in" class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-gold/30 bg-midnight-soft/80 text-gold text-xs uppercase tracking-[0.28em] mb-8 reveal-fade is-visible">
+          <span>CHƯƠNG 01 • THE FIRST LIGHT</span>
+        </div>
+
+        <!-- Sequential Opening Lines -->
+        <div class="space-y-4 mb-10">
+          <p id="intro-line-1" data-reveal-mode="blur-to-focus" class="font-editorial italic text-xl sm:text-2xl md:text-3xl text-ivory/90 reveal-blur is-visible">
+            “Có một hành trình bắt đầu từ những điều rất nhỏ…”
+          </p>
+          <p id="intro-line-2" data-reveal-mode="word-by-word" class="font-editorial italic text-xl sm:text-2xl md:text-3xl text-champagne reveal-words is-visible">
+            “Và có những người đã âm thầm thắp sáng hành trình ấy.”
+          </p>
+        </div>
+
+        <!-- Main Ceremonial Title -->
+        <div data-reveal-mode="clip-path" class="my-8 py-6 px-4 rounded-2xl border border-gold/20 bg-gradient-to-b from-midnight-soft/70 via-midnight/85 to-midnight-soft/70 shadow-2xl reveal-clip is-visible">
+          <p data-reveal-mode="letter-spacing" class="text-xs sm:text-sm uppercase tracking-[0.35em] text-gold mb-3 reveal-spacing is-visible">
+            HAPPY VIETNAMESE TEACHERS' DAY
+          </p>
+          <h1 class="font-editorial font-bold text-6xl sm:text-7xl md:text-8xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-champagne via-gold to-gold-dark leading-none my-2">
+            20.11
+          </h1>
+          <p class="font-editorial text-lg sm:text-2xl text-ivory/85 tracking-wide mt-2">
+            THE ART OF GRATITUDE
+          </p>
+          <div class="w-24 h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent mx-auto my-5"></div>
+          <p class="text-sm sm:text-base md:text-lg text-ivory/90 max-w-2xl mx-auto font-light leading-relaxed">
+            “Tri ân những người đã dành cả tâm huyết để gieo mầm tri thức.”
+          </p>
+        </div>
+
+        <!-- Core Epigraph Quote -->
+        <blockquote class="max-w-2xl mx-auto text-xs sm:text-sm text-dusty-light italic mb-10 px-4 leading-relaxed">
+          “Có những người không đi cùng ta suốt cuộc đời, nhưng những điều họ dạy sẽ theo ta đến tận cuối con đường.”
+        </blockquote>
+
+        <!-- Primary CTA -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button id="btn-start-journey" type="button" class="group relative inline-flex items-center gap-3 px-7 sm:px-8 py-4 rounded-full bg-gradient-to-r from-gold-dark via-gold to-champagne text-midnight font-semibold text-xs sm:text-base tracking-wider uppercase shadow-[0_0_35px_rgba(201,164,92,0.4)] hover:shadow-[0_0_50px_rgba(243,229,171,0.7)] hover:scale-[1.02] active:scale-[0.99] transition-all">
+            <span>[ BẮT ĐẦU HÀNH TRÌNH ]</span>
+            <span class="transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+          </button>
+          <button id="btn-jump-book-3d" type="button" class="px-6 py-3.5 rounded-full border border-gold/35 bg-midnight-soft/70 hover:bg-gold/15 text-xs sm:text-sm text-champagne transition-colors">
+            Khám phá ngay Cuốn Sách 3D (Chương 03)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHƯƠNG 02 — THE CLASSROOM OF MEMORIES (Lớp học của những ký ức)
+    ==================================================================== -->
+    <section id="chapter-02" data-chapter-index="1" class="chapter-section relative min-h-screen py-20 px-4 sm:px-8 border-b border-gold/10 overflow-hidden bg-gradient-to-b from-midnight via-midnight-soft/90 to-midnight">
+      <!-- Sunlight Beam through Classroom Window (Parallax Layer) -->
+      <div data-parallax-speed="-0.15" class="parallax-layer absolute -top-12 right-10 w-80 h-[520px] bg-gradient-to-bl from-champagne/15 via-gold/5 to-transparent rotate-12 blur-2xl pointer-events-none" aria-hidden="true"></div>
+
+      <div class="max-w-6xl mx-auto relative z-10">
+        <!-- Chapter Header -->
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <span class="text-xs uppercase tracking-[0.3em] text-gold block mb-2 reveal-fade">CHƯƠNG 02 • THE CLASSROOM OF MEMORIES</span>
+          <h2 data-reveal-mode="mask-reveal" class="font-editorial text-3xl sm:text-5xl text-ivory font-semibold mb-4 reveal-mask">
+            <span>Lớp Học Của Những Ký Ức</span>
+          </h2>
+          <p class="text-sm sm:text-base text-dusty-light">
+            Chạm vào từng kỷ vật trong lớp học để lắng nghe những mảnh ghép thanh xuân dưới mái trường.
+          </p>
+        </div>
+
+        <!-- Main Classroom Interactive Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- Left 7 Cols: Interactive Chalkboard with Chalk Writing Effect -->
+          <div class="lg:col-span-7 chalkboard-surface rounded-2xl p-5 sm:p-8">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-ivory/15 pb-3 mb-5">
+              <span class="font-handwritten text-xl sm:text-2xl text-champagne">Thứ Sáu, ngày 20 tháng 11...</span>
+              <button id="btn-replay-chalk" type="button" class="px-3 py-1 rounded-full border border-ivory/25 bg-black/25 hover:border-champagne text-xs text-ivory/85 transition-colors">
+                Viết lại nét phấn
+              </button>
+            </div>
+
+            <!-- Chalkboard Storytelling Content (Typewriter / Chalk mode) -->
+            <div id="chalkboard-story-box" data-reveal-mode="typewriter" class="space-y-5 py-2 min-h-[220px]">
+              <p id="chalk-quote-1" class="chalk-text font-editorial italic text-xl sm:text-2xl leading-relaxed">
+                “Ta từng nghĩ những ngày đến trường chỉ là những buổi học bình thường.”
+              </p>
+              <p id="chalk-quote-2" class="chalk-text font-sans text-sm sm:text-base leading-relaxed text-ivory/85">
+                “Những bài kiểm tra, những lần mắc lỗi, những lời nhắc nhở, những ánh mắt động viên…”
+              </p>
+              <p id="chalk-quote-3" class="chalk-text font-editorial text-lg sm:text-xl text-champagne leading-relaxed">
+                “Đến một ngày nhìn lại, ta mới hiểu rằng chính những điều giản dị ấy đã tạo nên một phần thanh xuân.”
+              </p>
+            </div>
+
+            <!-- Chalk Ledge & Interactive Classroom Objects -->
+            <div class="mt-6 pt-4 border-t border-ivory/15">
+              <p class="text-xs uppercase tracking-wider text-gold/90 mb-3">
+                Vật thể ký ức trong lớp học (Nhấn để khám phá):
+              </p>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <button type="button" data-memory-id="chalk" class="classroom-object-btn text-left p-3 rounded-xl border border-gold bg-gold/20 text-ivory transition-all">
+                  <span class="block text-xs font-semibold text-champagne">01. Viên phấn trắng</span>
+                  <span class="block text-[11px] text-ivory/75 mt-0.5">Bụi phấn rơi trên tóc</span>
+                </button>
+                <button type="button" data-memory-id="window" class="classroom-object-btn text-left p-3 rounded-xl border border-ivory/15 bg-black/30 hover:border-gold/50 text-ivory transition-all">
+                  <span class="block text-xs font-semibold text-champagne">02. Khung cửa nắng</span>
+                  <span class="block text-[11px] text-ivory/75 mt-0.5">Chiều thu qua tán lá</span>
+                </button>
+                <button type="button" data-memory-id="notebook" class="classroom-object-btn text-left p-3 rounded-xl border border-ivory/15 bg-black/30 hover:border-gold/50 text-ivory transition-all">
+                  <span class="block text-xs font-semibold text-champagne">03. Trang vở học trò</span>
+                  <span class="block text-[11px] text-ivory/75 mt-0.5">Dòng phê đỏ ân cần</span>
+                </button>
+                <button type="button" data-memory-id="desk" class="classroom-object-btn text-left p-3 rounded-xl border border-ivory/15 bg-black/30 hover:border-gold/50 text-ivory transition-all">
+                  <span class="block text-xs font-semibold text-champagne">04. Bàn gỗ cuối lớp</span>
+                  <span class="block text-[11px] text-ivory/75 mt-0.5">Ánh mắt thầy khích lệ</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 5 Cols: Active Memory Detail Card & Notebook Page -->
+          <div class="lg:col-span-5 space-y-5">
+            <div class="notebook-paper rounded-2xl p-6 sm:p-7 relative">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <span id="memory-card-badge" class="text-[11px] uppercase tracking-widest font-semibold text-burgundy bg-burgundy/10 px-2.5 py-0.5 rounded">
+                  KÝ ỨC #01 • VIÊN PHẤN TRẮNG
+                </span>
+                <span class="font-handwritten text-lg text-burgundy">Kỷ niệm mái trường</span>
+              </div>
+              <h3 id="memory-card-title" class="font-editorial font-bold text-2xl sm:text-3xl text-midnight mb-3">
+                Những nét phấn gieo chữ đầu đời
+              </h3>
+              <p id="memory-card-body" class="text-sm sm:text-base text-midnight/90 leading-relaxed mb-4">
+                Mỗi viên phấn ngắn dần trên bục giảng là một định lý được sáng tỏ, một vần thơ mở ra chân trời mới. Bụi phấn bay nhẹ trong nắng sớm đã âm thầm điểm bạc mái đầu người đứng lớp.
+              </p>
+              <blockquote id="memory-card-note" class="font-handwritten text-xl text-burgundy border-l-2 border-burgundy/50 pl-3 py-1">
+                “Nét chữ thầy cô thẳng tắp trên bảng đen, nâng đỡ những nét viết còn vụng về của chúng em.”
+              </blockquote>
+            </div>
+
+            <!-- Floating Memory Frames (Parallax depth cards) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div data-parallax-speed="0.06" class="parallax-layer p-4 rounded-xl border border-gold/20 bg-midnight-card/90 backdrop-blur-sm">
+                <p class="text-xs text-gold uppercase tracking-wider mb-1">Thanh âm quen thuộc</p>
+                <p class="text-xs sm:text-sm text-ivory/85 leading-relaxed">
+                  Tiếng trống trường báo giờ vào lớp, tiếng lật vở sột soạt và giọng giảng bài trầm ấm vang vọng.
+                </p>
+              </div>
+              <div data-parallax-speed="0.1" class="parallax-layer p-4 rounded-xl border border-gold/20 bg-midnight-card/90 backdrop-blur-sm">
+                <p class="text-xs text-gold uppercase tracking-wider mb-1">Khoảnh khắc trưởng thành</p>
+                <p class="text-xs sm:text-sm text-ivory/85 leading-relaxed">
+                  Lần đầu giải được bài khó, bắt gặp cái gật đầu mỉm cười đầy tin tưởng từ bục giảng.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHƯƠNG 03 — THE BOOK OF GRATITUDE (Cuốn sách tri ân - 3D Experience)
+    ==================================================================== -->
+    <section id="chapter-03" data-chapter-index="2" class="chapter-section relative min-h-screen py-20 px-4 sm:px-8 border-b border-gold/15 overflow-hidden bg-radial from-midnight-soft via-midnight to-midnight-deep">
+      <!-- Warm Golden Spotlight Behind Book -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[760px] h-[500px] rounded-full bg-gold/15 blur-[130px] pointer-events-none" aria-hidden="true"></div>
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Chapter Header -->
+        <div class="text-center max-w-3xl mx-auto mb-8">
+          <div class="inline-flex items-center gap-2 mb-2">
+            <span class="text-xs uppercase tracking-[0.3em] text-gold">CHƯƠNG 03 • THE BOOK OF GRATITUDE</span>
+            <span id="webgl-engine-badge" class="text-[10px] px-2 py-0.5 rounded-full border border-gold/30 bg-gold/10 text-champagne font-mono">3D Hybrid Ready</span>
+          </div>
+          <h2 class="font-editorial text-3xl sm:text-5xl text-ivory font-semibold mb-3">
+            NHỮNG ĐIỀU THẦY CÔ ĐỂ LẠI
+          </h2>
+          <p class="text-xs sm:text-sm text-dusty-light max-w-2xl mx-auto">
+            Nhấn vào cuốn sách 3D để mở và lật từng trang tri ân, kéo nhẹ để nghiêng góc nhìn 3D, hoặc chạm vào các từ khóa đang chuyển động theo quỹ đạo xung quanh sách.
+          </p>
+        </div>
+
+        <!-- 3D Book Controls Bar -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6">
+          <button id="btn-book-toggle-open" type="button" class="px-5 py-2.5 rounded-full bg-gold text-midnight font-semibold text-xs sm:text-sm tracking-wide hover:bg-champagne transition-all shadow-lg">
+            Mở Cuốn Sách 3D
+          </button>
+          <button id="btn-book-prev-page" type="button" class="px-4 py-2.5 rounded-full border border-gold/35 bg-midnight-soft/90 hover:border-gold text-xs sm:text-sm text-ivory disabled:opacity-40 transition-colors">
+            ← Trang trước
+          </button>
+          <span id="book-page-indicator" class="px-3.5 py-1.5 rounded-full bg-midnight-card border border-gold/25 text-xs text-champagne font-mono">
+            Bìa sách • Trang 0 / 4
+          </span>
+          <button id="btn-book-next-page" type="button" class="px-4 py-2.5 rounded-full border border-gold/35 bg-midnight-soft/90 hover:border-gold text-xs sm:text-sm text-ivory transition-colors">
+            Trang tiếp →
+          </button>
+          <button id="btn-book-orbit-pause" type="button" class="px-3.5 py-2 rounded-full border border-dusty/40 bg-midnight-soft/70 hover:border-gold/60 text-xs text-ivory/80 transition-colors">
+            Tạm dừng quỹ đạo chữ
+          </button>
+        </div>
+
+        <!-- 3D STAGE: WebGL Three.js Canvas + Synchronized CSS3D Book & 3D Orbiting Words -->
+        <div id="book-3d-stage" class="relative w-full min-h-[460px] sm:min-h-[540px] flex items-center justify-center my-4 select-none">
+          <!-- Three.js WebGL Layer (3D Pedestal Halo, Volumetric Rings, Golden Dust & 3D Book Mesh) -->
+          <canvas id="three-book-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+
+          <!-- 3D ORBITING WORDS CONTAINER (Required: circular, spiral, depth z-scaling, clickable) -->
+          <div id="orbiting-words-layer" class="absolute inset-0 pointer-events-none z-30 overflow-hidden sm:overflow-visible">
+            <!-- Populated dynamically from authentic data -->
+          </div>
+
+          <!-- INTERACTIVE 3D BOOK ASSEMBLY (Cover, Spine, Layered Pages, Realistic Lighting & Shadows) -->
+          <div class="book-viewport relative z-20 flex items-center justify-center w-full">
+            <div id="book-3d-object" class="book-3d-assembly cursor-pointer" role="region" aria-label="Cuốn sách 3D Những Điều Thầy Cô Để Lại">
+              <!-- Realistic Floor Shadow -->
+              <div class="absolute -bottom-8 left-6 right-6 h-12 rounded-full bg-black/75 blur-xl pointer-events-none"></div>
+
+              <!-- 3D Spine -->
+              <div class="book-spine-3d"></div>
+
+              <!-- Stacked Paper Layers (Left & Right thickness) -->
+              <div class="book-page-stack-left"></div>
+              <div class="book-page-stack-right"></div>
+
+              <!-- CLOSED COVER OVERLAY (When book is closed) -->
+              <div id="book-closed-cover" class="absolute inset-0 z-30 flex items-center justify-center transition-all duration-700">
+                <div class="w-[280px] sm:w-[360px] h-[395px] sm:h-[430px] rounded-r-2xl rounded-l-md bg-gradient-to-br from-burgundy via-burgundy-deep to-midnight-deep border-2 border-gold/70 shadow-[0_25px_60px_rgba(0,0,0,0.85)] p-5 sm:p-8 flex flex-col justify-between text-center relative overflow-hidden group">
+                  <div class="border border-gold/35 rounded-lg pointer-events-none p-4 sm:p-5 flex flex-col justify-between h-full">
+                    <div>
+                      <p class="text-[10px] uppercase tracking-[0.3em] text-gold/90">Ấn Bản Nghệ Thuật Tri Ân • 20.11</p>
+                      <div class="w-12 h-[1px] bg-gold/60 mx-auto mt-2"></div>
+                    </div>
+
+                    <div class="my-auto py-3">
+                      <div class="w-11 h-11 rounded-full border border-gold/60 bg-gold/10 mx-auto mb-3 flex items-center justify-center text-champagne font-editorial text-xl">
+                        ✦
+                      </div>
+                      <h3 class="font-editorial font-bold text-2xl sm:text-3xl text-champagne tracking-wide leading-snug">
+                        NHỮNG ĐIỀU<br/>THẦY CÔ ĐỂ LẠI
+                      </h3>
+                      <p class="font-handwritten text-lg text-gold-light mt-2">
+                        The Book of Gratitude
+                      </p>
+                    </div>
+
+                    <div>
+                      <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/20 border border-gold/50 text-xs text-champagne group-hover:bg-gold group-hover:text-midnight transition-colors font-medium">
+                        Nhấn để mở sách 3D →
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OPEN 2-PAGE SPREAD (Left & Right 3D Pages) -->
+              <div id="book-open-spread" class="absolute inset-2 z-20 grid grid-cols-1 sm:grid-cols-2 rounded-lg overflow-hidden opacity-0 pointer-events-none transition-opacity duration-500 shadow-2xl">
+                <!-- Left Page -->
+                <div class="book-page-surface book-page-left-shadow p-4 sm:p-7 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-gold/30 relative">
+                  <div class="flex items-center justify-between text-[10px] sm:text-[11px] uppercase tracking-widest text-gold-dark font-semibold">
+                    <span id="book-left-header">CHƯƠNG TRI ÂN • TRANG TRÁI</span>
+                    <span id="book-left-num">01</span>
+                  </div>
+
+                  <div class="my-auto py-2 sm:py-4">
+                    <p id="book-left-quote-main" class="font-editorial italic font-semibold text-lg sm:text-2xl text-midnight leading-snug sm:leading-relaxed mb-2 sm:mb-4">
+                      “Thầy cô không chỉ dạy ta cách giải một bài toán.”
+                    </p>
+                    <p id="book-left-quote-sub" class="font-sans text-xs sm:text-sm text-midnight/80 leading-relaxed">
+                      “Thầy cô còn dạy ta cách kiên nhẫn trước những điều chưa biết.”
+                    </p>
+                  </div>
+
+                  <div class="flex items-center justify-between text-[11px] text-midnight/60 border-t border-gold/25 pt-1.5">
+                    <span class="font-handwritten text-sm sm:text-base text-burgundy">Những điều thầy cô để lại</span>
+                    <span>✦</span>
+                  </div>
+                </div>
+
+                <!-- Right Page -->
+                <div class="book-page-surface book-page-right-shadow p-4 sm:p-7 flex flex-col justify-between relative">
+                  <div class="flex items-center justify-between text-[10px] sm:text-[11px] uppercase tracking-widest text-gold-dark font-semibold">
+                    <span id="book-right-header">SUY NGẪM & KÝ ỨC</span>
+                    <span id="book-right-num">02</span>
+                  </div>
+
+                  <div class="my-auto py-2 sm:py-4">
+                    <p id="book-right-quote-main" class="font-editorial italic font-semibold text-lg sm:text-2xl text-burgundy leading-snug sm:leading-relaxed mb-2 sm:mb-4">
+                      “Không chỉ dạy ta viết nên một câu văn.”
+                    </p>
+                    <p id="book-right-reflection" class="font-sans text-xs sm:text-sm text-midnight/80 leading-relaxed">
+                      “Mà còn giúp ta biết cách diễn đạt những suy nghĩ của chính mình.”
+                    </p>
+                  </div>
+
+                  <div class="flex items-center justify-between border-t border-gold/25 pt-1.5">
+                    <span id="book-spread-caption" class="text-[10px] sm:text-[11px] text-midnight/65">Trang đôi 1 / 4</span>
+                    <span class="text-[10px] sm:text-[11px] text-burgundy font-medium">Nhấn để lật tiếp →</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SELECTED ORBITING WORD INSIGHT PANEL & ACCESSIBLE KEYWORD BAR -->
+        <div class="max-w-4xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-midnight-card/90 border border-gold/30 rounded-2xl p-5 sm:p-6 shadow-xl">
+          <div class="md:col-span-5 border-b md:border-b-0 md:border-r border-gold/20 pb-4 md:pb-0 md:pr-5">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] uppercase tracking-[0.2em] text-gold">Từ khóa quỹ đạo đang chọn</span>
+              <span id="word-orbit-type" class="text-[10px] px-2 py-0.5 rounded bg-gold/15 text-champagne">Quỹ đạo vòng tròn</span>
+            </div>
+            <h3 id="selected-word-title" class="font-editorial font-bold text-2xl sm:text-3xl text-champagne mb-2">
+              “Tri thức”
+            </h3>
+            <p id="selected-word-desc" class="text-xs sm:text-sm text-ivory/85 leading-relaxed">
+              Không chỉ là những con chữ nằm yên trên trang giấy, tri thức thầy cô trao là chiếc la bàn giúp học trò tự định hướng giữa biển lớn cuộc đời.
+            </p>
+          </div>
+
+          <!-- Quick Interactive Keyword Pills (Synchronized with 3D Orbiting Words) -->
+          <div class="md:col-span-7">
+            <p class="text-xs text-dusty-light mb-2.5">
+              Danh sách 10 từ khóa bay quanh cuốn sách (nhấn trực tiếp trên không gian 3D hoặc chọn tại đây):
+            </p>
+            <div id="keyword-pills-list" class="flex flex-wrap gap-1.5">
+              <!-- Populated dynamically in sync with 3D orbit words -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHƯƠNG 04 — BEHIND EVERY LESSON (Phía sau mỗi bài học)
+    ==================================================================== -->
+    <section id="chapter-04" data-chapter-index="3" class="chapter-section relative min-h-screen py-20 px-4 sm:px-8 border-b border-gold/10 bg-gradient-to-b from-midnight-deep via-midnight-soft to-midnight">
+      <div class="max-w-5xl mx-auto relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+          <span class="text-xs uppercase tracking-[0.3em] text-gold block mb-2">CHƯƠNG 04 • BEHIND EVERY LESSON</span>
+          <h2 class="font-editorial text-3xl sm:text-5xl text-ivory font-semibold mb-4">
+            Phía Sau Mỗi Bài Học
+          </h2>
+          <p data-reveal-mode="line-by-line" class="font-editorial italic text-lg sm:text-2xl text-champagne leading-relaxed reveal-lines is-visible">
+            <span class="line-unit">“Đằng sau một bài học là rất nhiều điều không được viết trong giáo án.”</span>
+          </p>
+        </div>
+
+        <!-- Layered Story Cards (Scroll-triggered reveal) -->
+        <div class="space-y-6">
+          <article data-reveal-mode="scroll-triggered" class="lesson-layer-card reveal-scroll is-visible group rounded-2xl border border-gold/20 bg-midnight-card/80 hover:border-gold/55 p-6 sm:p-8 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <span class="text-xs uppercase tracking-[0.25em] text-gold font-medium">LỚP KÝ ỨC 01 • KHI THÀNH PHỐ ĐÃ LÊN ĐÈN</span>
+              <span class="text-xs text-dusty-light font-mono">23:15 PM • Bàn soạn bài</span>
+            </div>
+            <h3 class="font-editorial text-2xl sm:text-3xl text-ivory font-semibold mb-2">
+              Những giờ chuẩn bị bài trong lặng lẽ
+            </h3>
+            <p class="text-sm sm:text-base text-ivory/80 leading-relaxed">
+              Một tiết học bốn mươi lăm phút trên lớp bắt đầu từ nhiều đêm thức khuya tìm ví dụ dễ hiểu nhất, gạch sửa từng dòng ghi chú để ngày mai không một học sinh nào bị bỏ lại phía sau.
+            </p>
+          </article>
+
+          <article data-reveal-mode="scroll-triggered" class="lesson-layer-card reveal-scroll is-visible group rounded-2xl border border-gold/20 bg-midnight-card/80 hover:border-gold/55 p-6 sm:p-8 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <span class="text-xs uppercase tracking-[0.25em] text-gold font-medium">LỚP KÝ ỨC 02 • SỰ BỀN BỈ THẦM LẶNG</span>
+              <span class="text-xs text-dusty-light font-mono">Giờ ra chơi • Bục giảng</span>
+            </div>
+            <h3 class="font-editorial text-2xl sm:text-3xl text-ivory font-semibold mb-2">
+              Những lần kiên nhẫn giải thích
+            </h3>
+            <p class="text-sm sm:text-base text-ivory/80 leading-relaxed">
+              Khi chúng ta chưa hiểu một vấn đề, thầy cô không trách sự chậm chạp mà âm thầm đổi một cách tiếp cận khác, vẽ thêm một sơ đồ mới và kiên nhẫn chờ đợi khoảnh khắc ánh mắt học trò bừng sáng.
+            </p>
+          </article>
+
+          <article data-reveal-mode="scroll-triggered" class="lesson-layer-card reveal-scroll is-visible group rounded-2xl border border-gold/20 bg-midnight-card/80 hover:border-gold/55 p-6 sm:p-8 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <span class="text-xs uppercase tracking-[0.25em] text-gold font-medium">LỚP KÝ ỨC 03 • ĐIỂM TỰA TINH THẦN</span>
+              <span class="text-xs text-dusty-light font-mono">Sau một kỳ thi chưa trọn vẹn</span>
+            </div>
+            <h3 class="font-editorial text-2xl sm:text-3xl text-ivory font-semibold mb-2">
+              Những lời động viên khi học sinh thất bại
+            </h3>
+            <p class="text-sm sm:text-base text-ivory/80 leading-relaxed">
+              Một điểm số thấp có thể làm học trò nản lòng, nhưng một câu nói nhẹ nhàng “Lần sau em làm lại nhé, thầy tin em làm được” lại đủ sức giữ một ước mơ không gãy đổ.
+            </p>
+          </article>
+
+          <article data-reveal-mode="scroll-triggered" class="lesson-layer-card reveal-scroll is-visible group rounded-2xl border border-gold/20 bg-midnight-card/80 hover:border-gold/55 p-6 sm:p-8 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <span class="text-xs uppercase tracking-[0.25em] text-gold font-medium">LỚP KÝ ỨC 04 • NHỮNG KỲ VỌNG KHÔNG LỜI</span>
+              <span class="text-xs text-dusty-light font-mono">Nghiêm khắc & Bao dung</span>
+            </div>
+            <h3 class="font-editorial text-2xl sm:text-3xl text-ivory font-semibold mb-2">
+              Những kỳ vọng thầm lặng và nỗ lực không tên
+            </h3>
+            <p class="text-sm sm:text-base text-ivory/80 leading-relaxed">
+              Đằng sau vẻ nghiêm nghị trên lớp là nỗi lo học trò bước ra đời thiếu bản lĩnh; đằng sau mỗi lời nhắc nhở là mong ước nhìn thấy thế hệ sau vững vàng hơn chính mình.
+            </p>
+          </article>
+        </div>
+
+        <!-- Chapter 04 Closing Quote Highlight -->
+        <div class="mt-12 p-8 rounded-2xl border border-gold/35 bg-gradient-to-r from-burgundy-deep/60 via-midnight-card to-burgundy-deep/60 text-center shadow-xl">
+          <p class="font-editorial italic text-xl sm:text-3xl text-champagne leading-relaxed">
+            “Đằng sau một sự trưởng thành là những tháng ngày có người kiên nhẫn đồng hành.”
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHƯƠNG 05 — LETTERS NEVER FORGOTTEN (Những lời chưa kịp nói)
+    ==================================================================== -->
+    <section id="chapter-05" data-chapter-index="4" class="chapter-section relative min-h-screen py-20 px-4 sm:px-8 border-b border-gold/10 bg-midnight">
+      <!-- Desk Lamp Warm Glow -->
+      <div class="absolute top-24 left-1/4 w-96 h-96 rounded-full bg-champagne/10 blur-[120px] pointer-events-none" aria-hidden="true"></div>
+
+      <div class="max-w-5xl mx-auto relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-10">
+          <span class="text-xs uppercase tracking-[0.3em] text-gold block mb-2">CHƯƠNG 05 • LETTERS NEVER FORGOTTEN</span>
+          <h2 class="font-editorial text-3xl sm:text-5xl text-ivory font-semibold mb-3">
+            Những Lời Chưa Kịp Nói
+          </h2>
+          <p class="text-sm sm:text-base text-dusty-light">
+            Bên ánh đèn bàn ấm áp, những dòng thư được viết lại bằng sự lắng đọng của năm tháng.
+          </p>
+        </div>
+
+        <!-- Letter Selector Tabs (3 authentic curated letters, NOT a greeting card generator) -->
+        <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+          <button type="button" data-letter-idx="0" class="letter-tab-btn px-4 py-2 rounded-full bg-gold text-midnight font-semibold text-xs sm:text-sm transition-all">
+            Lá thư #01 — Gửi người kiên nhẫn chờ em hiểu bài
+          </button>
+          <button type="button" data-letter-idx="1" class="letter-tab-btn px-4 py-2 rounded-full border border-gold/30 bg-midnight-soft text-ivory/80 hover:text-ivory text-xs sm:text-sm transition-all">
+            Lá thư #02 — Gửi những buổi chiều cuối cấp
+          </button>
+          <button type="button" data-letter-idx="2" class="letter-tab-btn px-4 py-2 rounded-full border border-gold/30 bg-midnight-soft text-ivory/80 hover:text-ivory text-xs sm:text-sm transition-all">
+            Lá thư #03 — Khi chúng em đã đi xa mái trường
+          </button>
+        </div>
+
+        <!-- Writing Desk & Fountain Pen Letter Surface -->
+        <div class="notebook-paper rounded-2xl p-6 sm:p-12 max-w-3xl mx-auto relative border border-gold/40">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-midnight/15 pb-4 mb-6">
+            <div>
+              <span id="letter-header-tag" class="text-xs uppercase tracking-widest text-burgundy font-semibold block">LÁ THƯ LƯU GIỮ TRONG KÝ ỨC</span>
+              <h3 id="letter-title" class="font-editorial font-bold text-2xl sm:text-3xl text-midnight mt-1">
+                Gửi thầy cô của những năm tháng thanh xuân
+              </h3>
+            </div>
+            <button id="btn-replay-typewriter" type="button" class="px-3.5 py-1.5 rounded-full bg-burgundy text-ivory text-xs hover:bg-burgundy-light transition-colors">
+              Viết lại từng ký tự ✒
+            </button>
+          </div>
+
+          <!-- Character-by-character Handwritten/Editorial Letter Body -->
+          <div id="letter-typewriter-container" data-reveal-mode="char-by-char" class="space-y-5 min-h-[240px] text-midnight">
+            <p id="letter-p1" class="font-editorial italic text-xl sm:text-2xl leading-relaxed">
+              “Có thể chúng em không còn nhớ hết những bài học năm nào.”
+            </p>
+            <p id="letter-p2" class="font-editorial italic text-xl sm:text-2xl leading-relaxed">
+              “Nhưng chúng em vẫn nhớ những người đã kiên nhẫn chờ mình hiểu bài.”
+            </p>
+            <p id="letter-p3" class="font-editorial font-semibold text-xl sm:text-2xl text-burgundy leading-relaxed">
+              “Cảm ơn thầy cô vì đã không chỉ nhìn thấy chúng em của hiện tại, mà còn tin vào con người chúng em có thể trở thành.”
+            </p>
+          </div>
+
+          <div class="mt-8 pt-4 border-t border-midnight/15 flex flex-wrap items-center justify-between gap-2 text-midnight/75">
+            <span class="font-handwritten text-2xl text-burgundy">Những thế hệ học trò luôn nhớ ơn</span>
+            <span class="text-xs font-mono uppercase tracking-wider">Ngày 20 tháng 11</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHƯƠNG 06 — THE GARDEN OF KNOWLEDGE (Khu vườn tri thức)
+    ==================================================================== -->
+    <section id="chapter-06" data-chapter-index="5" class="chapter-section relative min-h-screen py-20 px-4 sm:px-8 border-b border-gold/10 bg-gradient-to-b from-midnight via-midnight-soft to-midnight">
+      <div class="max-w-6xl mx-auto relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-10">
+          <span class="text-xs uppercase tracking-[0.3em] text-gold block mb-2">CHƯƠNG 06 • THE GARDEN OF KNOWLEDGE</span>
+          <h2 class="font-editorial text-3xl sm:text-5xl text-ivory font-semibold mb-4">
+            Khu Vườn Tri Thức
+          </h2>
+          <p class="font-editorial italic text-lg sm:text-2xl text-champagne mb-2">
+            “Một hạt mầm cần thời gian để trưởng thành.”
+          </p>
+          <p class="text-sm sm:text-base text-ivory/80">
+            “Một con người cũng cần thời gian, sự dẫn dắt và niềm tin để tìm thấy con đường của mình.”
+          </p>
+        </div>
+
+        <!-- Interactive Knowledge Tree / Constellation Canvas + Node Controls -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 relative rounded-2xl border border-gold/25 bg-midnight-deep/90 overflow-hidden shadow-2xl">
+            <canvas id="garden-canvas" class="w-full h-[360px] sm:h-[440px] block cursor-pointer" title="Nhấn vào các hạt sáng để nuôi dưỡng nhánh tri thức"></canvas>
+            <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[11px] text-ivory/70 pointer-events-none">
+              <span>Chạm vào không gian hoặc chọn các điểm nút để mở rộng nhánh sáng</span>
+              <span id="garden-growth-percent" class="text-gold font-mono">Độ lan tỏa: 100%</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 space-y-4">
+            <div class="p-6 rounded-2xl border border-gold/30 bg-midnight-card shadow-lg">
+              <span id="garden-node-stage" class="text-xs uppercase tracking-[0.2em] text-gold block mb-1">ĐIỂM KẾT NỐI 01 • GIEO HẠT</span>
+              <h3 id="garden-node-title" class="font-editorial text-2xl sm:text-3xl text-champagne font-semibold mb-2">
+                Khơi dậy sự tò mò đầu tiên
+              </h3>
+              <p id="garden-node-desc" class="text-sm sm:text-base text-ivory/85 leading-relaxed">
+                Từ một câu hỏi nhỏ trên lớp, người thầy gieo xuống lòng học trò niềm say mê khám phá thế giới rộng lớn.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <button type="button" data-garden-node="0" class="garden-node-btn text-left p-3.5 rounded-xl border border-gold bg-gold/20 text-xs text-ivory transition-all">
+                <strong class="block text-champagne mb-0.5">01. Hạt mầm tri thức</strong>
+                <span>Khơi nguồn đam mê học hỏi</span>
+              </button>
+              <button type="button" data-garden-node="1" class="garden-node-btn text-left p-3.5 rounded-xl border border-gold/20 bg-midnight-card/70 hover:border-gold/50 text-xs text-ivory transition-all">
+                <strong class="block text-champagne mb-0.5">02. Bộ rễ nhân cách</strong>
+                <span>Lòng trung thực và sự tử tế</span>
+              </button>
+              <button type="button" data-garden-node="2" class="garden-node-btn text-left p-3.5 rounded-xl border border-gold/20 bg-midnight-card/70 hover:border-gold/50 text-xs text-ivory transition-all">
+                <strong class="block text-champagne mb-0.5">03. Thân cây bản lĩnh</strong>
+                <span>Đứng vững trước thử thách</span>
+              </button>
+              <button type="button" data-garden-node="3" class="garden-node-btn text-left p-3.5 rounded-xl border border-gold/20 bg-midnight-card/70 hover:border-gold/50 text-xs text-ivory transition-all">
+                <strong class="block text-champagne mb-0.5">04. Tán lá sẻ chia</strong>
+                <span>Lan tỏa giá trị cho cộng đồng</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHƯƠNG 07 — A PROMISE TO THE FUTURE (Hành trình phía trước)
+    ==================================================================== -->
+    <section id="chapter-07" data-chapter-index="6" class="chapter-section relative min-h-screen py-20 px-4 sm:px-8 border-b border-gold/10 bg-gradient-to-b from-midnight via-[#132238] to-midnight overflow-hidden">
+      <div class="max-w-5xl mx-auto relative z-10 text-center">
+        <span class="text-xs uppercase tracking-[0.3em] text-gold block mb-2">CHƯƠNG 07 • A PROMISE TO THE FUTURE</span>
+        <h2 class="font-editorial text-3xl sm:text-5xl text-ivory font-semibold mb-6">
+          Hành Trình Phía Trước
+        </h2>
+
+        <!-- Forward Horizon Light Pathways Canvas -->
+        <div class="relative rounded-2xl border border-dusty/35 bg-midnight-deep/80 overflow-hidden mb-10 shadow-2xl">
+          <canvas id="future-horizon-canvas" class="w-full h-[300px] sm:h-[360px] block"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-t from-midnight-deep/90 via-transparent to-midnight-deep/60">
+            <p class="font-editorial italic text-2xl sm:text-4xl text-champagne max-w-3xl leading-relaxed mb-4">
+              “Rồi mỗi người sẽ bước đi trên một con đường khác nhau.”
+            </p>
+            <p class="text-sm sm:text-lg text-ivory/90 max-w-2xl leading-relaxed">
+              “Nhưng những điều được học, những giá trị được trao và những người từng dìu dắt ta sẽ luôn là một phần hành trang.”
+            </p>
+          </div>
+        </div>
+
+        <!-- 3 Horizon Milestones -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+          <div class="p-6 rounded-2xl border border-dusty/30 bg-midnight-card/85">
+            <span class="text-xs font-mono text-gold">CHẶNG ĐƯỜNG 01</span>
+            <h3 class="font-editorial text-2xl text-ivory font-semibold mt-1 mb-2">Vững vàng đôi chân</h3>
+            <p class="text-xs sm:text-sm text-ivory/80 leading-relaxed">
+              Mang theo phương pháp tư duy và sự kiên trì thầy cô rèn giũa để tự tin bước vào những chân trời mới.
+            </p>
+          </div>
+          <div class="p-6 rounded-2xl border border-dusty/30 bg-midnight-card/85">
+            <span class="text-xs font-mono text-gold">CHẶNG ĐƯỜNG 02</span>
+            <h3 class="font-editorial text-2xl text-ivory font-semibold mt-1 mb-2">Giữ sáng ngọn lửa</h3>
+            <p class="text-xs sm:text-sm text-ivory/80 leading-relaxed">
+              Dù ở bất kỳ lĩnh vực nào, sự tử tế và lòng tôn trọng tri thức vẫn là kim chỉ nam trong mỗi lựa chọn.
+            </p>
+          </div>
+          <div class="p-6 rounded-2xl border border-dusty/30 bg-midnight-card/85">
+            <span class="text-xs font-mono text-gold">CHẶNG ĐƯỜNG 03</span>
+            <h3 class="font-editorial text-2xl text-ivory font-semibold mt-1 mb-2">Tiếp nối lòng biết ơn</h3>
+            <p class="text-xs sm:text-sm text-ivory/80 leading-relaxed">
+              Sống xứng đáng với niềm tin mà thầy cô đã trao gửi từ những ngày chúng ta còn ngồi trên ghế nhà trường.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHƯƠNG 08 — THE FINAL TRIBUTE (Lời tri ân cuối hành trình)
+    ==================================================================== -->
+    <section id="chapter-08" data-chapter-index="7" class="chapter-section relative min-h-screen py-24 px-4 sm:px-8 flex flex-col items-center justify-center bg-gradient-to-b from-midnight via-midnight-deep to-[#04060c] overflow-hidden">
+      <!-- Golden Aura & Floating Embers -->
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+        <div class="w-[450px] sm:w-[700px] h-[450px] sm:h-[700px] rounded-full bg-gold/12 blur-[140px]"></div>
+      </div>
+
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <span class="text-xs uppercase tracking-[0.35em] text-gold block mb-6">CHƯƠNG 08 • THE FINAL TRIBUTE</span>
+
+        <!-- Rhythmic Tribute Lines -->
+        <div class="space-y-4 mb-12">
+          <p class="font-editorial italic text-xl sm:text-2xl md:text-3xl text-ivory/90">
+            “Cảm ơn những người đã chọn gieo mầm tri thức.”
+          </p>
+          <p class="font-editorial italic text-xl sm:text-2xl md:text-3xl text-ivory/90">
+            “Cảm ơn những người đã kiên nhẫn trước những lần chúng em chưa hiểu.”
+          </p>
+          <p class="font-editorial italic text-xl sm:text-2xl md:text-3xl text-champagne">
+            “Cảm ơn những người đã trao đi niềm tin, ngay cả khi chúng em chưa nhận ra giá trị của chính mình.”
+          </p>
+        </div>
+
+        <!-- Grand Tribute Plaque -->
+        <div class="p-6 sm:p-12 rounded-3xl border-2 border-gold/45 bg-gradient-to-b from-midnight-card/95 via-midnight-deep/95 to-burgundy-deep/35 shadow-[0_0_70px_rgba(201,164,92,0.2)] mb-10">
+          <p class="text-xs sm:text-sm uppercase tracking-[0.28em] text-gold mb-3">
+            CHÚC MỪNG NGÀY NHÀ GIÁO VIỆT NAM
+          </p>
+          <h2 class="font-editorial font-bold text-4xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-champagne via-gold to-champagne tracking-wide my-3">
+            20 THÁNG 11
+          </h2>
+          <div class="w-28 h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent mx-auto my-5"></div>
+          <p class="text-base sm:text-lg md:text-xl text-ivory font-light max-w-2xl mx-auto leading-relaxed">
+            Kính chúc quý thầy cô luôn mạnh khỏe, hạnh phúc và giữ mãi ngọn lửa yêu nghề.
+          </p>
+        </div>
+
+        <!-- Final Lingering Quotes -->
+        <div class="space-y-4 max-w-3xl mx-auto mb-12">
+          <p class="font-editorial italic text-lg sm:text-2xl text-ivory/90 leading-relaxed">
+            “Người thầy có thể không bước tiếp cùng học trò trên mọi chặng đường, nhưng những điều thầy cô dạy sẽ còn ở lại rất lâu.”
+          </p>
+          <p class="font-handwritten text-2xl sm:text-3xl text-gold-light pt-2">
+            “Có những bài học kết thúc khi tiếng trống trường vang lên. Nhưng lòng biết ơn thì không.”
+          </p>
+        </div>
+
+        <!-- Replay Journey Action -->
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <button id="btn-restart-journey" type="button" class="px-7 py-3.5 rounded-full border border-gold/50 bg-gold/15 hover:bg-gold hover:text-midnight text-xs sm:text-sm font-semibold text-champagne uppercase tracking-wider transition-all">
+            ↺ Trải nghiệm lại từ Chương 01
+          </button>
+          <button id="btn-revisit-book" type="button" class="px-6 py-3.5 rounded-full border border-ivory/20 bg-midnight-soft hover:border-gold/50 text-xs sm:text-sm text-ivory/85 transition-all">
+            Mở lại Cuốn Sách Tri Ân 3D
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="relative z-10 border-t border-gold/15 bg-midnight-deep py-8 px-4 sm:px-8 text-center text-xs text-dusty-light">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="font-editorial italic text-sm text-ivory/80">
+        20/11 — THE ART OF GRATITUDE • A Digital Journey of Respect, Memory, Knowledge & Gratitude
+      </p>
+      <p>
+        Thiết kế & Phát triển dành riêng cho Ngày Nhà giáo Việt Nam 20/11
+      </p>
+    </div>
+  </footer>
+
+  <!-- APPLICATION SCRIPT: Content Data, 3D Book & Orbit Engine, Motion Engine, Web Audio Synthesizer -->
+  <script>
+    (function () {
+      'use strict';
+
+      var CHAPTERS_META = [
+        { index: 0, id: 'chapter-01', code: 'CHƯƠNG 01', shortTitle: '01. Ánh sáng đầu tiên', name: 'Ánh sáng đầu tiên — The First Light' },
+        { index: 1, id: 'chapter-02', code: 'CHƯƠNG 02', shortTitle: '02. Lớp học ký ức', name: 'Lớp học của những ký ức — The Classroom of Memories' },
+        { index: 2, id: 'chapter-03', code: 'CHƯƠNG 03', shortTitle: '03. Cuốn sách tri ân', name: 'Cuốn sách tri ân — The Book of Gratitude' },
+        { index: 3, id: 'chapter-04', code: 'CHƯƠNG 04', shortTitle: '04. Phía sau bài học', name: 'Phía sau mỗi bài học — Behind Every Lesson' },
+        { index: 4, id: 'chapter-05', code: 'CHƯƠNG 05', shortTitle: '05. Những lá thư', name: 'Những lời chưa kịp nói — Letters Never Forgotten' },
+        { index: 5, id: 'chapter-06', code: 'CHƯƠNG 06', shortTitle: '06. Khu vườn tri thức', name: 'Khu vườn tri thức — The Garden of Knowledge' },
+        { index: 6, id: 'chapter-07', code: 'CHƯƠNG 07', shortTitle: '07. Hành trình phía trước', name: 'Hành trình phía trước — A Promise to the Future' },
+        { index: 7, id: 'chapter-08', code: 'CHƯƠNG 08', shortTitle: '08. Lời tri ân 20/11', name: 'Lời tri ân cuối hành trình — The Final Tribute' }
+      ];
+
+      var CLASSROOM_MEMORIES = {
+        chalk: {
+          badge: 'KÝ ỨC #01 • VIÊN PHẤN TRẮNG',
+          title: 'Những nét phấn gieo chữ đầu đời',
+          body: 'Mỗi viên phấn ngắn dần trên bục giảng là một định lý được sáng tỏ, một vần thơ mở ra chân trời mới. Bụi phấn bay nhẹ trong nắng sớm đã âm thầm điểm bạc mái đầu người đứng lớp.',
+          note: '“Nét chữ thầy cô thẳng tắp trên bảng đen, nâng đỡ những nét viết còn vụng về của chúng em.”'
+        },
+        window: {
+          badge: 'KÝ ỨC #02 • KHUNG CỬA NẮNG THU',
+          title: 'Ánh nắng qua khung cửa sổ lớp học',
+          body: 'Những buổi chiều nắng nghiêng qua khung cửa gỗ, chiếu lên trang sách mở rộng. Giọng thầy cô đều đặn vang lên giữa không gian yên bình khiến thời gian như lắng đọng.',
+          note: '“Có những chiều nhìn ra khung cửa lớp, chưa biết rằng đó là những tháng ngày bình yên nhất.”'
+        },
+        notebook: {
+          badge: 'KÝ ỨC #03 • TRANG VỞ HỌC TRÒ',
+          title: 'Dòng lời phê ấm áp cuối trang vở',
+          body: 'Từng trang vở thơm mùi giấy mới lưu giữ những dòng nhận xét nắn nót. Không chỉ sửa từng lỗi sai nhỏ, lời phê của thầy cô còn là sự khích lệ thầm lặng dành cho mỗi nỗ lực.',
+          note: '“Mỗi nét mực đỏ của thầy cô là một lần nhắc nhở để chúng em trưởng thành hơn.”'
+        },
+        desk: {
+          badge: 'KÝ ỨC #04 • CHIẾC BÀN GỖ CUỐI LỚP',
+          title: 'Ánh mắt động viên từ bục giảng',
+          body: 'Khi học trò ngập ngừng trước một câu hỏi khó, ánh mắt kiên nhẫn và cái gật đầu khích lệ của thầy cô đã biến nỗi sợ sai thành sự tự tin.',
+          note: '“Ta từng nghĩ những ngày đến trường chỉ là những buổi học bình thường…”'
+        }
+      };
+
+      var BOOK_SPREADS = [
+        {
+          leftHeader: 'BÀI HỌC VỀ SỰ KIÊN NHẪN',
+          leftNum: '01',
+          leftMain: '“Thầy cô không chỉ dạy ta cách giải một bài toán.”',
+          leftSub: '“Thầy cô còn dạy ta cách kiên nhẫn trước những điều chưa biết.”',
+          rightHeader: 'DIỄN ĐẠT CHÍNH MÌNH',
+          rightNum: '02',
+          rightMain: '“Không chỉ dạy ta viết nên một câu văn.”',
+          rightReflection: '“Mà còn giúp ta biết cách diễn đạt những suy nghĩ của chính mình.” Giữa muôn vàn trang sách, thầy cô giúp mỗi học trò tìm thấy tiếng nói chân thực và lòng tự trọng.'
+        },
+        {
+          leftHeader: 'TRAO GỬI NIỀM TIN',
+          leftNum: '03',
+          leftMain: '“Không chỉ truyền đạt kiến thức.”',
+          leftSub: '“Mà còn trao cho ta niềm tin để bước tiếp.”',
+          rightHeader: 'NGỌN ĐÈN DẪN LỐI',
+          rightNum: '04',
+          rightMain: '“Có những người không đi cùng ta suốt cuộc đời…”',
+          rightReflection: '“…nhưng những điều họ dạy sẽ theo ta đến tận cuối con đường.” Mỗi bài giảng trên lớp là một hạt giống âm thầm nảy nở khi học trò bước vào đường đời.'
+        },
+        {
+          leftHeader: 'LÒNG BAO DUNG THẦM LẶNG',
+          leftNum: '05',
+          leftMain: '“Những lần mắc lỗi thời niên thiếu đều được nâng đỡ bằng sự bao dung.”',
+          leftSub: 'Thầy cô nhìn thấy tiềm năng ẩn giấu ngay cả khi chúng ta còn hoài nghi chính mình.',
+          rightHeader: 'GIÁ TRỊ VƯỢT TRANG SÁCH',
+          rightNum: '06',
+          rightMain: '“Đằng sau một bài học là rất nhiều điều không được viết trong giáo án.”',
+          rightReflection: 'Đó là cách sống tử tế, cách lắng nghe người khác và cách đứng dậy sau những vấp ngã đầu đời.'
+        },
+        {
+          leftHeader: 'LỜI TRI ÂN 20 THÁNG 11',
+          leftNum: '07',
+          leftMain: '“Cảm ơn những người đã chọn gieo mầm tri thức.”',
+          leftSub: 'Dù năm tháng trôi qua và mái trường lùi lại phía sau, lòng biết ơn vẫn luôn vẹn nguyên.',
+          rightHeader: 'DẤU ẤN VĨNH CỬU',
+          rightNum: '08',
+          rightMain: '“Có những bài học kết thúc khi tiếng trống trường vang lên. Nhưng lòng biết ơn thì không.”',
+          rightReflection: 'Kính chúc quý thầy cô luôn dồi dào sức khỏe, bình an và giữ mãi ngọn lửa nhiệt huyết trên bục giảng.'
+        }
+      ];
+
+      var ORBIT_WORDS = [
+        {
+          word: 'Tri thức',
+          orbitType: 'Quỹ đạo vòng tròn',
+          radiusX: 250,
+          radiusY: 95,
+          radiusZ: 120,
+          angleOffset: 0.0,
+          speed: 0.35,
+          desc: 'Không chỉ là những con chữ nằm yên trên trang giấy, tri thức thầy cô trao là chiếc la bàn giúp học trò tự định hướng giữa biển lớn cuộc đời.'
+        },
+        {
+          word: 'Kiên nhẫn',
+          orbitType: 'Quỹ đạo xoắn ốc',
+          radiusX: 285,
+          radiusY: 135,
+          radiusZ: 140,
+          angleOffset: 0.628,
+          speed: 0.31,
+          desc: 'Là những lần thầy cô chậm rãi giảng lại một khái niệm khó, chờ đợi từng học trò hiểu thấu mà không một lời trách móc.'
+        },
+        {
+          word: 'Bao dung',
+          orbitType: 'Chuyển động chiều sâu',
+          radiusX: 240,
+          radiusY: 155,
+          radiusZ: 165,
+          angleOffset: 1.256,
+          speed: 0.28,
+          desc: 'Những vụng về, bồng bột của tuổi học trò luôn được thầy cô đón nhận bằng ánh mắt vị tha để mỗi lỗi lầm trở thành một bài học lớn.'
+        },
+        {
+          word: 'Dẫn lối',
+          orbitType: 'Quỹ đạo vòng tròn',
+          radiusX: 300,
+          radiusY: 110,
+          radiusZ: 130,
+          angleOffset: 1.884,
+          speed: 0.33,
+          desc: 'Khi học trò đứng trước những ngã rẽ đầu đời, lời khuyên chân thành của thầy cô chính là ánh đèn soi sáng bước chân.'
+        },
+        {
+          word: 'Ước mơ',
+          orbitType: 'Quỹ đạo xoắn ốc',
+          radiusX: 265,
+          radiusY: 165,
+          radiusZ: 150,
+          angleOffset: 2.512,
+          speed: 0.29,
+          desc: 'Nhiều ước mơ lớn lao đã được nhen nhóm từ một lời khen nhỏ của thầy cô trên trang vở học trò.'
+        },
+        {
+          word: 'Niềm tin',
+          orbitType: 'Trôi từ xa đến gần',
+          radiusX: 295,
+          radiusY: 125,
+          radiusZ: 175,
+          angleOffset: 3.141,
+          speed: 0.27,
+          desc: '“Không chỉ truyền đạt kiến thức, mà còn trao cho ta niềm tin để bước tiếp” — ngay cả khi chính ta còn tự ti về bản thân.'
+        },
+        {
+          word: 'Bài học',
+          orbitType: 'Quỹ đạo vòng tròn',
+          radiusX: 255,
+          radiusY: 145,
+          radiusZ: 125,
+          angleOffset: 3.769,
+          speed: 0.34,
+          desc: 'Có những bài học nằm trong sách giáo khoa, và có những bài học làm người được thầy cô truyền dạy bằng chính nhân cách sống.'
+        },
+        {
+          word: 'Trưởng thành',
+          orbitType: 'Chuyển động chiều sâu',
+          radiusX: 310,
+          radiusY: 105,
+          radiusZ: 160,
+          angleOffset: 4.398,
+          speed: 0.30,
+          desc: 'Đằng sau sự trưởng thành của mỗi học trò là biết bao tháng ngày có người thầy âm thầm dõi theo và nâng đỡ.'
+        },
+        {
+          word: 'Người gieo hạt',
+          orbitType: 'Quỹ đạo xoắn ốc',
+          radiusX: 275,
+          radiusY: 170,
+          radiusZ: 145,
+          angleOffset: 5.026,
+          speed: 0.26,
+          desc: 'Người gieo hạt không mong cầu tên mình được khắc lên từng mùa quả ngọt, chỉ mong những hạt mầm vươn thẳng dưới bầu trời.'
+        },
+        {
+          word: 'Ngọn đèn tri thức',
+          orbitType: 'Trôi từ xa đến gần',
+          radiusX: 320,
+          radiusY: 140,
+          radiusZ: 170,
+          angleOffset: 5.654,
+          speed: 0.32,
+          desc: 'Ngọn đèn bên bàn soạn giáo án đêm khuya đã thắp lên ánh sáng tri thức cho biết bao thế hệ nối tiếp nhau.'
+        }
+      ];
+
+      var LETTERS_DATA = [
+        {
+          tag: 'LÁ THƯ #01 • LỜI CHƯA KỊP NÓI',
+          title: 'Gửi người đã kiên nhẫn chờ chúng em hiểu bài',
+          p1: '“Có thể chúng em không còn nhớ hết những bài học năm nào.”',
+          p2: '“Nhưng chúng em vẫn nhớ những người đã kiên nhẫn chờ mình hiểu bài.”',
+          p3: '“Cảm ơn thầy cô vì đã không chỉ nhìn thấy chúng em của hiện tại, mà còn tin vào con người chúng em có thể trở thành.”'
+        },
+        {
+          tag: 'LÁ THƯ #02 • NHỮNG BUỔI CHIỀU CUỐI CẤP',
+          title: 'Gửi những tiết học cuối cùng dưới mái trường',
+          p1: '“Ngày còn ngồi trên ghế nhà trường, chúng em cứ ngỡ thời gian còn rất dài.”',
+          p2: '“Từng lời dặn dò của thầy cô trước kỳ thi lớn, từng ánh mắt dõi theo khi tiếng trống tan trường vang lên…”',
+          p3: '“Tất cả đã trở thành điểm tựa ấm áp nhất mỗi khi chúng em bước qua những ngày giông gió.”'
+        },
+        {
+          tag: 'LÁ THƯ #03 • HÀNH TRANG ĐI XA',
+          title: 'Gửi thầy cô từ những con đường trưởng thành',
+          p1: '“Giờ đây trên những chặng đường riêng, mỗi khi cần sự điềm tĩnh và lòng kiên trì, chúng em lại nhớ về thầy cô.”',
+          p2: '“Những điều thầy cô trao không chỉ giúp chúng em làm nghề, mà còn dạy chúng em cách làm người tử tế.”',
+          p3: '“Nhân ngày 20/11, chúng em xin gửi về bục giảng xưa lòng biết ơn sâu sắc và chân thành nhất.”'
+        }
+      ];
+
+      var GARDEN_NODES = [
+        {
+          stage: 'ĐIỂM KẾT NỐI 01 • HẠT MẦM TRI THỨC',
+          title: 'Khơi dậy sự tò mò đầu tiên',
+          desc: 'Từ một câu hỏi nhỏ trên lớp, người thầy gieo xuống lòng học trò niềm say mê khám phá thế giới rộng lớn.'
+        },
+        {
+          stage: 'ĐIỂM KẾT NỐI 02 • BỘ RỄ NHÂN CÁCH',
+          title: 'Lòng trung thực và sự tử tế',
+          desc: 'Trước khi vươn cao đón nắng, một cái cây cần bộ rễ sâu — giống như những giá trị đạo đức thầy cô bền bỉ bồi đắp mỗi ngày.'
+        },
+        {
+          stage: 'ĐIỂM KẾT NỐI 03 • THÂN CÂY BẢN LĨNH',
+          title: 'Đứng vững trước những thử thách',
+          desc: '“Một hạt mầm cần thời gian để trưởng thành.” Sự kiên nhẫn của thầy cô giúp học trò không gục ngã trước những lần vấp ngã đầu tiên.'
+        },
+        {
+          stage: 'ĐIỂM KẾT NỐI 04 • TÁN LÁ SẺ CHIA',
+          title: 'Lan tỏa giá trị cho cộng đồng',
+          desc: '“Một con người cũng cần thời gian, sự dẫn dắt và niềm tin để tìm thấy con đường của mình” và tiếp tục trao đi những điều tốt đẹp.'
+        }
+      ];
+
+      var state = {
+        currentChapter: 0,
+        bookOpen: false,
+        bookSpreadIndex: 0,
+        orbitPaused: false,
+        selectedWordIndex: 0,
+        selectedLetterIndex: 0,
+        selectedGardenNode: 0,
+        audioEnabled: false,
+        reducedMotion: false,
+        tabVisible: true
+      };
+
+      try {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          state.reducedMotion = true;
+          document.documentElement.classList.add('reduced-motion');
+        }
+      } catch (e) {}
+
+      var audioCtx = null;
+      var ambientTimer = null;
+
+      function ensureAudioContext() {
+        if (!audioCtx) {
+          var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      function playPianoNote(freq, duration, volume) {
+        if (!state.audioEnabled) return;
+        try {
+          ensureAudioContext();
+          if (!audioCtx) return;
+          var now = audioCtx.currentTime;
+          var osc = audioCtx.createOscillator();
+          var osc2 = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc2.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          osc2.frequency.setValueAtTime(freq * 2, now);
+
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(volume || 0.045, now + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + (duration || 2.4));
+
+          osc.connect(gain);
+          osc2.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc2.start(now);
+          osc.stop(now + (duration || 2.4));
+          osc.stop(now + (duration || 2.4));
+        } catch (e) {}
+      }
+
+      function playPageTurnSound() {
+        if (!state.audioEnabled) return;
+        try {
+          ensureAudioContext();
+          if (!audioCtx) return;
+          var bufferSize = Math.floor(audioCtx.sampleRate * 0.18);
+          var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          var data = buffer.getChannelData(0);
+          for (var i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufferSize) * Math.PI);
+          }
+          var noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+
+          var filter = audioCtx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1200;
+
+          var gain = audioCtx.createGain();
+          gain.gain.value = 0.035;
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          noise.start();
+        } catch (e) {}
+      }
+
+      function playChalkTick() {
+        if (!state.audioEnabled) return;
+        playPianoNote(660 + Math.random() * 180, 0.08, 0.012);
+      }
+
+      function startAmbientPianoLoop() {
+        if (ambientTimer) clearInterval(ambientTimer);
+        var chords = [
+          [261.63, 329.63, 392.00, 493.88],
+          [220.00, 261.63, 329.63, 392.00],
+          [174.61, 220.00, 261.63, 349.23],
+          [196.00, 246.94, 293.66, 392.00]
+        ];
+        var chordIdx = 0;
+        ambientTimer = setInterval(function () {
+          if (!state.audioEnabled || !state.tabVisible) return;
+          var chord = chords[chordIdx % chords.length];
+          chordIdx++;
+          chord.forEach(function (note, idx) {
+            setTimeout(function () {
+              if (state.audioEnabled) playPianoNote(note, 3.0, 0.025);
+            }, idx * 420);
+          });
+        }, 3600);
+      }
+
+      function toggleAudio() {
+        state.audioEnabled = !state.audioEnabled;
+        var btn = document.getElementById('btn-audio-toggle');
+        var dot = document.getElementById('audio-status-dot');
+        var label = document.getElementById('audio-status-label');
+        if (btn) btn.setAttribute('aria-pressed', String(state.audioEnabled));
+        if (dot) {
+          dot.className = state.audioEnabled
+            ? 'w-2 h-2 rounded-full bg-gold animate-pulse'
+            : 'w-2 h-2 rounded-full bg-dusty';
+        }
+        if (label) {
+          label.textContent = state.audioEnabled ? 'Âm thanh: Bật' : 'Âm thanh: Tắt';
+        }
+        try {
+          sessionStorage.setItem('art_of_gratitude_audio', state.audioEnabled ? 'on' : 'off');
+        } catch (e) {}
+
+        if (state.audioEnabled) {
+          playPianoNote(523.25, 1.8, 0.04);
+          startAmbientPianoLoop();
+        }
+      }
+
+      function updateNavUI(chapterIdx) {
+        state.currentChapter = chapterIdx;
+        var meta = CHAPTERS_META[chapterIdx] || CHAPTERS_META[0];
+
+        var labelEl = document.getElementById('nav-current-chapter-label');
+        if (labelEl) labelEl.textContent = meta.shortTitle;
+
+        var progressEl = document.getElementById('journey-progress-bar');
+        if (progressEl) {
+          var pct = ((chapterIdx + 1) / CHAPTERS_META.length) * 100;
+          progressEl.style.width = pct.toFixed(1) + '%';
+        }
+
+        var prevBtn = document.getElementById('btn-prev-chapter');
+        var nextBtn = document.getElementById('btn-next-chapter');
+        if (prevBtn) prevBtn.disabled = (chapterIdx <= 0);
+        if (nextBtn) nextBtn.disabled = (chapterIdx >= CHAPTERS_META.length - 1);
+
+        var pills = document.querySelectorAll('.chapter-nav-pill');
+        for (var i = 0; i < pills.length; i++) {
+          var idx = parseInt(pills[i].getAttribute('data-nav-chapter'), 10);
+          if (idx === chapterIdx) {
+            pills[i].className = 'chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-midnight bg-gold font-medium';
+          } else {
+            pills[i].className = 'chapter-nav-pill px-2.5 py-1 rounded-full text-xs transition-all text-ivory/70 hover:text-ivory';
+          }
+        }
+
+        var mobileBtns = document.querySelectorAll('.mobile-chapter-btn');
+        for (var j = 0; j < mobileBtns.length; j++) {
+          var mIdx = parseInt(mobileBtns[j].getAttribute('data-nav-chapter'), 10);
+          if (mIdx === chapterIdx) {
+            mobileBtns[j].className = 'mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold bg-gold/20 text-xs text-ivory font-medium';
+          } else {
+            mobileBtns[j].className = 'mobile-chapter-btn text-left px-3 py-2 rounded-lg border border-gold/15 bg-midnight-soft text-xs text-ivory/80';
+          }
+        }
+      }
+
+      function navigateToChapter(chapterIdx, useTransitionVeil) {
+        var clamped = Math.max(0, Math.min(CHAPTERS_META.length - 1, chapterIdx));
+        var meta = CHAPTERS_META[clamped];
+        var targetSection = document.getElementById(meta.id);
+        if (!targetSection) return;
+
+        updateNavUI(clamped);
+        playPianoNote(392 + clamped * 30, 1.5, 0.03);
+
+        var drawer = document.getElementById('mobile-chapter-drawer');
+        if (drawer && !drawer.classList.contains('hidden')) {
+          drawer.classList.add('hidden');
+        }
+
+        var veil = document.getElementById('chapter-transition-veil');
+        var codeEl = document.getElementById('transition-chapter-code');
+        var nameEl = document.getElementById('transition-chapter-name');
+
+        if (useTransitionVeil && !state.reducedMotion && veil) {
+          if (codeEl) codeEl.textContent = meta.code;
+          if (nameEl) nameEl.textContent = meta.name;
+          veil.classList.add('is-active');
+          setTimeout(function () {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 160);
+          setTimeout(function () {
+            veil.classList.remove('is-active');
+          }, 480);
+        } else {
+          targetSection.scrollIntoView({ behavior: state.reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        }
+      }
+
+      function selectClassroomMemory(memoryId) {
+        var item = CLASSROOM_MEMORIES[memoryId];
+        if (!item) return;
+        playPageTurnSound();
+
+        var badge = document.getElementById('memory-card-badge');
+        var title = document.getElementById('memory-card-title');
+        var body = document.getElementById('memory-card-body');
+        var note = document.getElementById('memory-card-note');
+
+        if (badge) badge.textContent = item.badge;
+        if (title) title.textContent = item.title;
+        if (body) body.textContent = item.body;
+        if (note) note.textContent = item.note;
+
+        var btns = document.querySelectorAll('.classroom-object-btn');
+        for (var i = 0; i < btns.length; i++) {
+          if (btns[i].getAttribute('data-memory-id') === memoryId) {
+            btns[i].className = 'classroom-object-btn text-left p-3 rounded-xl border border-gold bg-gold/20 text-ivory transition-all';
+          } else {
+            btns[i].className = 'classroom-object-btn text-left p-3 rounded-xl border border-ivory/15 bg-black/30 hover:border-gold/50 text-ivory transition-all';
+          }
+        }
+      }
+
+      var chalkTimer = null;
+      function replayChalkWriting() {
+        if (chalkTimer) clearInterval(chalkTimer);
+        var q1 = document.getElementById('chalk-quote-1');
+        var q2 = document.getElementById('chalk-quote-2');
+        var q3 = document.getElementById('chalk-quote-3');
+        if (!q1 || !q2 || !q3) return;
+
+        var full1 = '“Ta từng nghĩ những ngày đến trường chỉ là những buổi học bình thường.”';
+        var full2 = '“Những bài kiểm tra, những lần mắc lỗi, những lời nhắc nhở, những ánh mắt động viên…”';
+        var full3 = '“Đến một ngày nhìn lại, ta mới hiểu rằng chính những điều giản dị ấy đã tạo nên một phần thanh xuân.”';
+
+        if (state.reducedMotion) {
+          q1.textContent = full1;
+          q2.textContent = full2;
+          q3.textContent = full3;
+          return;
+        }
+
+        q1.textContent = '';
+        q2.textContent = '';
+        q3.textContent = '';
+
+        var step = 0;
+        var totalLen = full1.length + full2.length + full3.length;
+        chalkTimer = setInterval(function () {
+          step += 3;
+          if (step % 9 === 0) playChalkTick();
+          if (step <= full1.length) {
+            q1.textContent = full1.slice(0, step);
+          } else if (step <= full1.length + full2.length) {
+            q1.textContent = full1;
+            q2.textContent = full2.slice(0, step - full1.length);
+          } else if (step <= totalLen) {
+            q2.textContent = full2;
+            q3.textContent = full3.slice(0, step - full1.length - full2.length);
+          } else {
+            q1.textContent = full1;
+            q2.textContent = full2;
+            q3.textContent = full3;
+            clearInterval(chalkTimer);
+          }
+        }, 22);
+      }
+
+      function renderBookState() {
+        var coverEl = document.getElementById('book-closed-cover');
+        var spreadEl = document.getElementById('book-open-spread');
+        var toggleBtn = document.getElementById('btn-book-toggle-open');
+        var prevBtn = document.getElementById('btn-book-prev-page');
+        var indicator = document.getElementById('book-page-indicator');
+        var bookObj = document.getElementById('book-3d-object');
+
+        if (!state.bookOpen) {
+          if (coverEl) {
+            coverEl.style.opacity = '1';
+            coverEl.style.pointerEvents = 'auto';
+            coverEl.style.transform = 'rotateY(0deg)';
+          }
+          if (spreadEl) {
+            spreadEl.style.opacity = '0';
+            spreadEl.style.pointerEvents = 'none';
+          }
+          if (toggleBtn) toggleBtn.textContent = 'Mở Cuốn Sách 3D';
+          if (prevBtn) prevBtn.disabled = true;
+          if (indicator) indicator.textContent = 'Bìa sách • Trang 0 / ' + BOOK_SPREADS.length;
+          if (bookObj && !state.reducedMotion) {
+            bookObj.style.transform = 'rotateX(10deg) rotateY(-12deg)';
+          }
+        } else {
+          if (coverEl) {
+            coverEl.style.opacity = '0';
+            coverEl.style.pointerEvents = 'none';
+            coverEl.style.transform = 'rotateY(-150deg)';
+          }
+          if (spreadEl) {
+            spreadEl.style.opacity = '1';
+            spreadEl.style.pointerEvents = 'auto';
+          }
+          if (toggleBtn) toggleBtn.textContent = 'Đóng Cuốn Sách 3D';
+          if (prevBtn) prevBtn.disabled = false;
+
+          var spread = BOOK_SPREADS[state.bookSpreadIndex] || BOOK_SPREADS[0];
+          var lHeader = document.getElementById('book-left-header');
+          var lNum = document.getElementById('book-left-num');
+          var lMain = document.getElementById('book-left-quote-main');
+          var lSub = document.getElementById('book-left-quote-sub');
+          var rHeader = document.getElementById('book-right-header');
+          var rNum = document.getElementById('book-right-num');
+          var rMain = document.getElementById('book-right-quote-main');
+          var rRef = document.getElementById('book-right-reflection');
+          var cap = document.getElementById('book-spread-caption');
+
+          if (lHeader) lHeader.textContent = spread.leftHeader;
+          if (lNum) lNum.textContent = spread.leftNum;
+          if (lMain) lMain.textContent = spread.leftMain;
+          if (lSub) lSub.textContent = spread.leftSub;
+          if (rHeader) rHeader.textContent = spread.rightHeader;
+          if (rNum) rNum.textContent = spread.rightNum;
+          if (rMain) rMain.textContent = spread.rightMain;
+          if (rRef) rRef.textContent = spread.rightReflection;
+          if (cap) cap.textContent = 'Trang đôi ' + (state.bookSpreadIndex + 1) + ' / ' + BOOK_SPREADS.length;
+          if (indicator) indicator.textContent = 'Trang đôi ' + (state.bookSpreadIndex + 1) + ' / ' + BOOK_SPREADS.length;
+
+          if (bookObj && !state.reducedMotion) {
+            var tiltY = (state.bookSpreadIndex - 1.5) * 3.2;
+            bookObj.style.transform = 'rotateX(7deg) rotateY(' + tiltY.toFixed(1) + 'deg)';
+          }
+        }
+      }
+
+      function toggleBookOpen() {
+        state.bookOpen = !state.bookOpen;
+        playPageTurnSound();
+        renderBookState();
+      }
+
+      function nextBookPage() {
+        playPageTurnSound();
+        if (!state.bookOpen) {
+          state.bookOpen = true;
+          state.bookSpreadIndex = 0;
+        } else if (state.bookSpreadIndex < BOOK_SPREADS.length - 1) {
+          state.bookSpreadIndex++;
+        } else {
+          state.bookSpreadIndex = 0;
+        }
+        renderBookState();
+      }
+
+      function prevBookPage() {
+        playPageTurnSound();
+        if (!state.bookOpen) return;
+        if (state.bookSpreadIndex > 0) {
+          state.bookSpreadIndex--;
+        } else {
+          state.bookOpen = false;
+        }
+        renderBookState();
+      }
+
+      var orbitWordElements = [];
+      function initOrbitingWords() {
+        var orbitContainer = document.getElementById('orbiting-words-layer');
+        var pillsContainer = document.getElementById('keyword-pills-list');
+        if (!orbitContainer || !pillsContainer) return;
+
+        orbitContainer.innerHTML = '';
+        pillsContainer.innerHTML = '';
+        orbitWordElements = [];
+
+        ORBIT_WORDS.forEach(function (item, idx) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.setAttribute('data-word-idx', String(idx));
+          btn.className = 'orbit-word-node pointer-events-auto px-3 py-1.5 rounded-full border border-gold/45 bg-midnight-deep/85 text-champagne text-xs sm:text-sm font-editorial italic tracking-wide shadow-[0_0_20px_rgba(201,164,92,0.25)] whitespace-nowrap';
+          btn.textContent = '“' + item.word + '”';
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            selectOrbitWord(idx);
+          });
+          orbitContainer.appendChild(btn);
+          orbitWordElements.push(btn);
+
+          var pill = document.createElement('button');
+          pill.type = 'button';
+          pill.setAttribute('data-pill-idx', String(idx));
+          pill.className = 'keyword-pill-btn px-3 py-1 rounded-full border text-xs transition-all';
+          pill.textContent = item.word;
+          pill.addEventListener('click', function () {
+            selectOrbitWord(idx);
+          });
+          pillsContainer.appendChild(pill);
+        });
+
+        selectOrbitWord(0);
+      }
+
+      function selectOrbitWord(idx) {
+        state.selectedWordIndex = idx;
+        var item = ORBIT_WORDS[idx] || ORBIT_WORDS[0];
+        playPianoNote(440 + idx * 28, 1.4, 0.03);
+
+        var titleEl = document.getElementById('selected-word-title');
+        var descEl = document.getElementById('selected-word-desc');
+        var typeEl = document.getElementById('word-orbit-type');
+
+        if (titleEl) titleEl.textContent = '“' + item.word + '”';
+        if (descEl) descEl.textContent = item.desc;
+        if (typeEl) typeEl.textContent = item.orbitType;
+
+        for (var i = 0; i < orbitWordElements.length; i++) {
+          if (i === idx) {
+            orbitWordElements[i].classList.add('is-active-word');
+          } else {
+            orbitWordElements[i].classList.remove('is-active-word');
+          }
+        }
+
+        var pills = document.querySelectorAll('.keyword-pill-btn');
+        for (var j = 0; j < pills.length; j++) {
+          if (j === idx) {
+            pills[j].className = 'keyword-pill-btn px-3 py-1 rounded-full border border-gold bg-gold text-midnight font-semibold text-xs transition-all';
+          } else {
+            pills[j].className = 'keyword-pill-btn px-3 py-1 rounded-full border border-gold/25 bg-midnight-soft text-ivory/80 hover:border-gold/60 text-xs transition-all';
+          }
+        }
+      }
+
+      var threeScene = null;
+      var threeCamera = null;
+      var threeRenderer = null;
+      var threeBookGroup = null;
+      var threeRing1 = null;
+      var threeRing2 = null;
+
+      function initThreeBookScene() {
+        var canvas = document.getElementById('three-book-canvas');
+        var badge = document.getElementById('webgl-engine-badge');
+        if (!canvas || typeof THREE === 'undefined') {
+          if (badge) badge.textContent = 'CSS3D Fallback Active';
+          return;
+        }
+        try {
+          var width = canvas.clientWidth || 800;
+          var height = canvas.clientHeight || 520;
+
+          threeScene = new THREE.Scene();
+          threeCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+          threeCamera.position.set(0, 0.6, 7.5);
+
+          threeRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+          threeRenderer.setSize(width, height);
+          threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+          var ambientLight = new THREE.AmbientLight(0xf3e5ab, 0.65);
+          threeScene.add(ambientLight);
+
+          var pointLight = new THREE.PointLight(0xc9a45c, 1.4, 20);
+          pointLight.position.set(2, 3, 4);
+          threeScene.add(pointLight);
+
+          threeBookGroup = new THREE.Group();
+          threeScene.add(threeBookGroup);
+
+          var ringGeo1 = new THREE.RingGeometry(2.85, 2.88, 64);
+          var ringMat1 = new THREE.MeshBasicMaterial({ color: 0xc9a45c, side: THREE.DoubleSide, transparent: true, opacity: 0.28 });
+          threeRing1 = new THREE.Mesh(ringGeo1, ringMat1);
+          threeRing1.rotation.x = Math.PI / 2.5;
+          threeBookGroup.add(threeRing1);
+
+          var ringGeo2 = new THREE.RingGeometry(3.45, 3.48, 64);
+          var ringMat2 = new THREE.MeshBasicMaterial({ color: 0xf3e5ab, side: THREE.DoubleSide, transparent: true, opacity: 0.18 });
+          threeRing2 = new THREE.Mesh(ringGeo2, ringMat2);
+          threeRing2.rotation.x = -Math.PI / 3;
+          threeRing2.rotation.y = Math.PI / 6;
+          threeBookGroup.add(threeRing2);
+
+          if (badge) badge.textContent = 'WebGL + CSS3D Active';
+        } catch (err) {
+          threeRenderer = null;
+          if (badge) badge.textContent = 'CSS3D Fallback Active';
+        }
+      }
+
+      var letterTimer = null;
+      function selectLetter(idx) {
+        state.selectedLetterIndex = idx;
+        var item = LETTERS_DATA[idx] || LETTERS_DATA[0];
+        playPageTurnSound();
+
+        var tagEl = document.getElementById('letter-header-tag');
+        var titleEl = document.getElementById('letter-title');
+        if (tagEl) tagEl.textContent = item.tag;
+        if (titleEl) titleEl.textContent = item.title;
+
+        var tabs = document.querySelectorAll('.letter-tab-btn');
+        for (var i = 0; i < tabs.length; i++) {
+          var tIdx = parseInt(tabs[i].getAttribute('data-letter-idx'), 10);
+          if (tIdx === idx) {
+            tabs[i].className = 'letter-tab-btn px-4 py-2 rounded-full bg-gold text-midnight font-semibold text-xs sm:text-sm transition-all';
+          } else {
+            tabs[i].className = 'letter-tab-btn px-4 py-2 rounded-full border border-gold/30 bg-midnight-soft text-ivory/80 hover:text-ivory text-xs sm:text-sm transition-all';
+          }
+        }
+
+        runLetterTypewriter(item);
+      }
+
+      function runLetterTypewriter(item) {
+        if (letterTimer) clearInterval(letterTimer);
+        var p1 = document.getElementById('letter-p1');
+        var p2 = document.getElementById('letter-p2');
+        var p3 = document.getElementById('letter-p3');
+        if (!p1 || !p2 || !p3) return;
+
+        if (state.reducedMotion) {
+          p1.textContent = item.p1;
+          p2.textContent = item.p2;
+          p3.textContent = item.p3;
+          return;
+        }
+
+        p1.textContent = '';
+        p2.textContent = '';
+        p3.textContent = '';
+
+        var charStep = 0;
+        var l1 = item.p1.length;
+        var l2 = item.p2.length;
+        var l3 = item.p3.length;
+        var total = l1 + l2 + l3;
+
+        letterTimer = setInterval(function () {
+          charStep += 3;
+          if (charStep % 12 === 0) playChalkTick();
+          if (charStep <= l1) {
+            p1.textContent = item.p1.slice(0, charStep);
+          } else if (charStep <= l1 + l2) {
+            p1.textContent = item.p1;
+            p2.textContent = item.p2.slice(0, charStep - l1);
+          } else if (charStep <= total) {
+            p2.textContent = item.p2;
+            p3.textContent = item.p3.slice(0, charStep - l1 - l2);
+          } else {
+            p1.textContent = item.p1;
+            p2.textContent = item.p2;
+            p3.textContent = item.p3;
+            clearInterval(letterTimer);
+          }
+        }, 20);
+      }
+
+      function selectGardenNode(nodeIdx) {
+        state.selectedGardenNode = nodeIdx;
+        var node = GARDEN_NODES[nodeIdx] || GARDEN_NODES[0];
+        playPianoNote(493.88 + nodeIdx * 45, 1.6, 0.03);
+
+        var stageEl = document.getElementById('garden-node-stage');
+        var titleEl = document.getElementById('garden-node-title');
+        var descEl = document.getElementById('garden-node-desc');
+        if (stageEl) stageEl.textContent = node.stage;
+        if (titleEl) titleEl.textContent = node.title;
+        if (descEl) descEl.textContent = node.desc;
+
+        var btns = document.querySelectorAll('.garden-node-btn');
+        for (var i = 0; i < btns.length; i++) {
+          var bIdx = parseInt(btns[i].getAttribute('data-garden-node'), 10);
+          if (bIdx === nodeIdx) {
+            btns[i].className = 'garden-node-btn text-left p-3.5 rounded-xl border border-gold bg-gold/20 text-xs text-ivory transition-all';
+          } else {
+            btns[i].className = 'garden-node-btn text-left p-3.5 rounded-xl border border-gold/20 bg-midnight-card/70 hover:border-gold/50 text-xs text-ivory transition-all';
+          }
+        }
+      }
+
+      var ambientParticles = [];
+      function initAmbientParticles() {
+        var isMobile = window.innerWidth < 768;
+        var count = isMobile ? 24 : 52;
+        ambientParticles = [];
+        for (var i = 0; i < count; i++) {
+          ambientParticles.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            r: 1 + Math.random() * 2.2,
+            vx: (Math.random() - 0.5) * 0.25,
+            vy: -0.15 - Math.random() * 0.35,
+            alpha: 0.2 + Math.random() * 0.55
+          });
+        }
+      }
+
+      var animTime = 0;
+      function masterAnimationLoop() {
+        requestAnimationFrame(masterAnimationLoop);
+        if (!state.tabVisible) return;
+
+        var dt = state.reducedMotion ? 0 : 0.016;
+        animTime += dt;
+
+        var ambCanvas = document.getElementById('ambient-particle-canvas');
+        if (ambCanvas) {
+          var actx = ambCanvas.getContext('2d');
+          if (actx) {
+            if (ambCanvas.width !== window.innerWidth || ambCanvas.height !== window.innerHeight) {
+              ambCanvas.width = window.innerWidth;
+              ambCanvas.height = window.innerHeight;
+            }
+            actx.clearRect(0, 0, ambCanvas.width, ambCanvas.height);
+            for (var i = 0; i < ambientParticles.length; i++) {
+              var p = ambientParticles[i];
+              if (!state.reducedMotion) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.y < -10) p.y = ambCanvas.height + 10;
+                if (p.x < -10) p.x = ambCanvas.width + 10;
+                if (p.x > ambCanvas.width + 10) p.x = -10;
+              }
+              actx.beginPath();
+              actx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              actx.fillStyle = 'rgba(243, 229, 171, ' + p.alpha.toFixed(2) + ')';
+              actx.fill();
+            }
+          }
+        }
+
+        var vw = window.innerWidth;
+        var maxRx = Math.max(95, Math.min(310, (vw * 0.5) - 72));
+        var scaleFactor = maxRx / 310;
+
+        for (var w = 0; w < orbitWordElements.length; w++) {
+          var wData = ORBIT_WORDS[w];
+          var el = orbitWordElements[w];
+          var angle = wData.angleOffset + (state.orbitPaused ? 0 : animTime * wData.speed);
+
+          var rx = wData.radiusX * scaleFactor;
+          var ry = wData.radiusY * Math.max(0.62, scaleFactor);
+          var rz = wData.radiusZ * scaleFactor;
+
+          var x = Math.cos(angle) * rx;
+          var y = Math.sin(angle * 1.2) * ry;
+          var z = Math.sin(angle) * rz;
+
+          var depthNorm = (z + rz) / (2 * rz || 1);
+          var scale = 0.76 + depthNorm * 0.34;
+          var opacity = 0.42 + depthNorm * 0.58;
+          var zIndex = Math.round(10 + depthNorm * 30);
+
+          if (w === state.selectedWordIndex) {
+            scale = 1.1;
+            opacity = 1;
+            zIndex = 60;
+          }
+
+          el.style.transform = 'translate(-50%, -50%) translate3d(' + x.toFixed(1) + 'px, ' + y.toFixed(1) + 'px, ' + z.toFixed(1) + 'px) scale(' + scale.toFixed(2) + ')';
+          el.style.opacity = opacity.toFixed(2);
+          el.style.zIndex = String(zIndex);
+        }
+
+        if (threeRenderer && threeScene && threeCamera) {
+          if (!state.orbitPaused && !state.reducedMotion) {
+            if (threeRing1) threeRing1.rotation.z = animTime * 0.22;
+            if (threeRing2) threeRing2.rotation.z = -animTime * 0.16;
+          }
+          threeRenderer.render(threeScene, threeCamera);
+        }
+
+        var gCanvas = document.getElementById('garden-canvas');
+        if (gCanvas) {
+          var gctx = gCanvas.getContext('2d');
+          var gw = gCanvas.clientWidth || 600;
+          var gh = gCanvas.clientHeight || 400;
+          if (gCanvas.width !== gw || gCanvas.height !== gh) {
+            gCanvas.width = gw;
+            gCanvas.height = gh;
+          }
+          gctx.clearRect(0, 0, gw, gh);
+
+          var cx = gw * 0.5;
+          var by = gh * 0.86;
+
+          var nodeCoords = [
+            { x: gw * 0.5, y: gh * 0.62, label: '01. Hạt mầm' },
+            { x: gw * 0.26, y: gh * 0.44, label: '02. Nhân cách' },
+            { x: gw * 0.74, y: gh * 0.40, label: '03. Bản lĩnh' },
+            { x: gw * 0.5, y: gh * 0.20, label: '04. Sẻ chia' }
+          ];
+
+          gctx.strokeStyle = 'rgba(201, 164, 92, 0.55)';
+          gctx.lineWidth = 2.2;
+          nodeCoords.forEach(function (nc, idx) {
+            gctx.beginPath();
+            gctx.moveTo(cx, by);
+            gctx.quadraticCurveTo(cx + (idx % 2 === 0 ? -25 : 25), (by + nc.y) * 0.5, nc.x, nc.y);
+            gctx.stroke();
+
+            var isSelected = idx === state.selectedGardenNode;
+            var pulse = isSelected ? (12 + Math.sin(animTime * 3) * 3) : 8;
+            var grad = gctx.createRadialGradient(nc.x, nc.y, 2, nc.x, nc.y, pulse * 2.2);
+            grad.addColorStop(0, '#f3e5ab');
+            grad.addColorStop(0.5, isSelected ? '#c9a45c' : 'rgba(201, 164, 92, 0.6)');
+            grad.addColorStop(1, 'rgba(201, 164, 92, 0)');
+            gctx.fillStyle = grad;
+            gctx.beginPath();
+            gctx.arc(nc.x, nc.y, pulse * 2.2, 0, Math.PI * 2);
+            gctx.fill();
+
+            gctx.fillStyle = isSelected ? '#f3e5ab' : '#ede4d3';
+            gctx.font = '500 12px "Be Vietnam Pro", sans-serif';
+            gctx.textAlign = 'center';
+            gctx.fillText(nc.label, nc.x, nc.y - 18);
+          });
+        }
+
+        var fCanvas = document.getElementById('future-horizon-canvas');
+        if (fCanvas) {
+          var fctx = fCanvas.getContext('2d');
+          var fw = fCanvas.clientWidth || 700;
+          var fh = fCanvas.clientHeight || 320;
+          if (fCanvas.width !== fw || fCanvas.height !== fh) {
+            fCanvas.width = fw;
+            fCanvas.height = fh;
+          }
+          fctx.clearRect(0, 0, fw, fh);
+
+          var vx = fw * 0.5;
+          var vy = fh * 0.35;
+          fctx.strokeStyle = 'rgba(201, 164, 92, 0.25)';
+          fctx.lineWidth = 1.2;
+          for (var ray = -6; ray <= 6; ray++) {
+            fctx.beginPath();
+            fctx.moveTo(vx, vy);
+            fctx.lineTo(vx + ray * (fw * 0.12), fh);
+            fctx.stroke();
+          }
+
+          for (var stepLine = 0; stepLine < 5; stepLine++) {
+            var prog = ((animTime * 0.25 + stepLine * 0.2) % 1);
+            var ly = vy + prog * (fh - vy);
+            fctx.strokeStyle = 'rgba(243, 229, 171, ' + (prog * 0.45).toFixed(2) + ')';
+            fctx.beginPath();
+            fctx.moveTo(vx - prog * fw * 0.6, ly);
+            fctx.lineTo(vx + prog * fw * 0.6, ly);
+            fctx.stroke();
+          }
+        }
+      }
+
+      function initWordByWordReveal() {
+        var wordEls = document.querySelectorAll('.reveal-words');
+        for (var i = 0; i < wordEls.length; i++) {
+          var el = wordEls[i];
+          var raw = el.textContent.trim();
+          var words = raw.split(/\s+/);
+          el.innerHTML = '';
+          words.forEach(function (w, idx) {
+            var span = document.createElement('span');
+            span.className = 'word-unit';
+            span.style.transitionDelay = (idx * 55) + 'ms';
+            span.textContent = w;
+            el.appendChild(span);
+          });
+        }
+      }
+
+      function initEvents() {
+        document.addEventListener('visibilitychange', function () {
+          state.tabVisible = !document.hidden;
+        });
+
+        window.addEventListener('scroll', function () {
+          if (state.reducedMotion) return;
+          var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          var layers = document.querySelectorAll('.parallax-layer');
+          for (var i = 0; i < layers.length; i++) {
+            var speed = parseFloat(layers[i].getAttribute('data-parallax-speed') || '0.05');
+            var yPos = -(scrollY * speed);
+            layers[i].style.transform = 'translate3d(0, ' + yPos.toFixed(1) + 'px, 0)';
+          }
+        }, { passive: true });
+
+        var navButtons = document.querySelectorAll('[data-nav-chapter]');
+        for (var i = 0; i < navButtons.length; i++) {
+          navButtons[i].addEventListener('click', function () {
+            var targetIdx = parseInt(this.getAttribute('data-nav-chapter'), 10);
+            navigateToChapter(targetIdx, true);
+          });
+        }
+
+        var brandBtn = document.getElementById('brand-home-btn');
+        if (brandBtn) {
+          brandBtn.addEventListener('click', function () {
+            navigateToChapter(0, true);
+          });
+        }
+
+        var prevChapterBtn = document.getElementById('btn-prev-chapter');
+        if (prevChapterBtn) {
+          prevChapterBtn.addEventListener('click', function () {
+            navigateToChapter(state.currentChapter - 1, true);
+          });
+        }
+
+        var nextChapterBtn = document.getElementById('btn-next-chapter');
+        if (nextChapterBtn) {
+          nextChapterBtn.addEventListener('click', function () {
+            navigateToChapter(state.currentChapter + 1, true);
+          });
+        }
+
+        var mobileDrawerBtn = document.getElementById('btn-mobile-chapters');
+        var mobileDrawer = document.getElementById('mobile-chapter-drawer');
+        if (mobileDrawerBtn && mobileDrawer) {
+          mobileDrawerBtn.addEventListener('click', function () {
+            mobileDrawer.classList.toggle('hidden');
+          });
+        }
+
+        var startBtn = document.getElementById('btn-start-journey');
+        if (startBtn) {
+          startBtn.addEventListener('click', function () {
+            navigateToChapter(1, true);
+          });
+        }
+
+        var skipIntroBtn = document.getElementById('btn-skip-intro');
+        if (skipIntroBtn) {
+          skipIntroBtn.addEventListener('click', function () {
+            navigateToChapter(1, false);
+          });
+        }
+
+        var jumpBookBtn = document.getElementById('btn-jump-book-3d');
+        if (jumpBookBtn) {
+          jumpBookBtn.addEventListener('click', function () {
+            navigateToChapter(2, true);
+            if (!state.bookOpen) toggleBookOpen();
+          });
+        }
+
+        var memBtns = document.querySelectorAll('.classroom-object-btn');
+        for (var m = 0; m < memBtns.length; m++) {
+          memBtns[m].addEventListener('click', function () {
+            selectClassroomMemory(this.getAttribute('data-memory-id'));
+          });
+        }
+
+        var replayChalkBtn = document.getElementById('btn-replay-chalk');
+        if (replayChalkBtn) {
+          replayChalkBtn.addEventListener('click', replayChalkWriting);
+        }
+
+        var bookToggleBtn = document.getElementById('btn-book-toggle-open');
+        if (bookToggleBtn) {
+          bookToggleBtn.addEventListener('click', toggleBookOpen);
+        }
+
+        var bookClosedCover = document.getElementById('book-closed-cover');
+        if (bookClosedCover) {
+          bookClosedCover.addEventListener('click', function () {
+            if (!state.bookOpen) toggleBookOpen();
+          });
+        }
+
+        var bookOpenSpread = document.getElementById('book-open-spread');
+        if (bookOpenSpread) {
+          bookOpenSpread.addEventListener('click', nextBookPage);
+        }
+
+        var bookPrevBtn = document.getElementById('btn-book-prev-page');
+        if (bookPrevBtn) {
+          bookPrevBtn.addEventListener('click', prevBookPage);
+        }
+
+        var bookNextBtn = document.getElementById('btn-book-next-page');
+        if (bookNextBtn) {
+          bookNextBtn.addEventListener('click', nextBookPage);
+        }
+
+        var orbitPauseBtn = document.getElementById('btn-book-orbit-pause');
+        if (orbitPauseBtn) {
+          orbitPauseBtn.addEventListener('click', function () {
+            state.orbitPaused = !state.orbitPaused;
+            this.textContent = state.orbitPaused ? 'Tiếp tục quỹ đạo chữ' : 'Tạm dừng quỹ đạo chữ';
+          });
+        }
+
+        var letterBtns = document.querySelectorAll('.letter-tab-btn');
+        for (var l = 0; l < letterBtns.length; l++) {
+          letterBtns[l].addEventListener('click', function () {
+            selectLetter(parseInt(this.getAttribute('data-letter-idx'), 10));
+          });
+        }
+
+        var replayLetterBtn = document.getElementById('btn-replay-typewriter');
+        if (replayLetterBtn) {
+          replayLetterBtn.addEventListener('click', function () {
+            runLetterTypewriter(LETTERS_DATA[state.selectedLetterIndex] || LETTERS_DATA[0]);
+          });
+        }
+
+        var gardenBtns = document.querySelectorAll('.garden-node-btn');
+        for (var g = 0; g < gardenBtns.length; g++) {
+          gardenBtns[g].addEventListener('click', function () {
+            selectGardenNode(parseInt(this.getAttribute('data-garden-node'), 10));
+          });
+        }
+
+        var gardenCanvas = document.getElementById('garden-canvas');
+        if (gardenCanvas) {
+          gardenCanvas.addEventListener('click', function () {
+            selectGardenNode((state.selectedGardenNode + 1) % GARDEN_NODES.length);
+          });
+        }
+
+        var restartBtn = document.getElementById('btn-restart-journey');
+        if (restartBtn) {
+          restartBtn.addEventListener('click', function () {
+            navigateToChapter(0, true);
+          });
+        }
+
+        var revisitBookBtn = document.getElementById('btn-revisit-book');
+        if (revisitBookBtn) {
+          revisitBookBtn.addEventListener('click', function () {
+            navigateToChapter(2, true);
+            if (!state.bookOpen) toggleBookOpen();
+          });
+        }
+
+        var audioBtn = document.getElementById('btn-audio-toggle');
+        if (audioBtn) {
+          audioBtn.addEventListener('click', toggleAudio);
+        }
+
+        var motionBtn = document.getElementById('btn-motion-toggle');
+        if (motionBtn) {
+          motionBtn.addEventListener('click', function () {
+            state.reducedMotion = !state.reducedMotion;
+            document.documentElement.classList.toggle('reduced-motion', state.reducedMotion);
+            this.setAttribute('aria-pressed', String(state.reducedMotion));
+            var lbl = document.getElementById('motion-status-label');
+            if (lbl) lbl.textContent = state.reducedMotion ? 'Motion: Tối giản' : 'Motion: Đầy đủ';
+          });
+        }
+
+        var fsBtn = document.getElementById('btn-fullscreen-toggle');
+        if (fsBtn) {
+          fsBtn.addEventListener('click', function () {
+            try {
+              if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+              } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+              }
+            } catch (e) {}
+          });
+        }
+
+        if ('IntersectionObserver' in window) {
+          var sectionObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var idx = parseInt(entry.target.getAttribute('data-chapter-index'), 10);
+                if (!isNaN(idx)) updateNavUI(idx);
+              }
+            });
+          }, { threshold: 0.35 });
+
+          var sections = document.querySelectorAll('.chapter-section');
+          for (var s = 0; s < sections.length; s++) {
+            sectionObserver.observe(sections[s]);
+          }
+
+          var revealObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+              }
+            });
+          }, { threshold: 0.12 });
+
+          var reveals = document.querySelectorAll('.reveal-fade, .reveal-blur, .reveal-spacing, .reveal-mask, .reveal-clip, .reveal-words, .reveal-lines, .reveal-scroll');
+          for (var r = 0; r < reveals.length; r++) {
+            revealObserver.observe(reveals[r]);
+          }
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', function () {
+        initWordByWordReveal();
+        initAmbientParticles();
+        initOrbitingWords();
+        initThreeBookScene();
+        renderBookState();
+        initEvents();
+        masterAnimationLoop();
+      });
+    })();
+  </script>
+</body>
+</html>
